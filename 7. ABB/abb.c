@@ -1,4 +1,5 @@
 #include "abb.h"
+#include "pila.h"
 #include <stdlib.h>
 #include <string.h>
 #include <stddef.h>
@@ -22,10 +23,11 @@ struct abb {
 	abb_comparar_clave_t comparar_clave;
 	abb_destruir_dato_t destruir_dato;
 };
-/*
-struct abb_iter{
-    //???
-};*/
+
+struct abb_iter {
+  abb_t* abb;
+  pila_t* pila_aux;
+};
 
 /* *****************************************************************
  *                    FUNCIONES AUXILIARES
@@ -155,7 +157,7 @@ bool abb_guardar(abb_t *arbol, const char *clave, void *dato){
 	}
 	return true;
 }
-
+/*
 size_t cant_hijos(nodo_abb_t* aux) {
   if (!aux->der && !aux->izq) return 0;
   if (aux->der && aux->izq) return 2;
@@ -198,7 +200,7 @@ void *abb_borrar(abb_t *arbol, const char *clave) {
   }
   nodo_abb_destruir(aux,NULL); //No queremos destruir el dato
   return dato;
-}
+}*/
 
 void * abb_obtener(const abb_t *arbol, const char *clave){
 	nodo_abb_t * aux_padre = NULL,*aux;
@@ -262,27 +264,20 @@ void apilar_izq(abb_iter_t* iter, nodo_abb_t* nodo) {
 
 }
 // fin de funciones auxiliares
-typedef struct abb_iter abb_iter_t;
-
-struct abb_iter {
-  abb_t* abb;
-  pila_t* pila_aux;
-}
-
 
  abb_iter_t *abb_iter_in_crear(const abb_t *arbol) {
   abb_iter_t* iter = malloc(sizeof(abb_iter_t));
   if (!iter) return NULL;
 
-  pila_t* pila = crear_pila();
+  pila_t* pila = pila_crear();
   if (!pila) return NULL;
 
   iter->pila_aux = pila;
-  iter->abb = arbol;
+  //iter->abb = arbol;
 
   apilar_izq(iter, NULL);
-
- }
+  return iter;
+}
 
 bool abb_iter_in_avanzar(abb_iter_t *iter) {
   if (pila_esta_vacia(iter->pila_aux)) return false;
