@@ -60,18 +60,18 @@ void abb_destruir(abb_t *arbol);
 /* Iterador del abb */
 
 // Crea iterador
-abb_iter_t *abb_iter_crear(const abb_t *arbol);
+abb_iter_t *abb_iter_in_crear(const abb_t *arbol);
 
 // Avanza iterador
-bool abb_iter_avanzar(abb_iter_t *iter);
+bool abb_iter_in_avanzar(abb_iter_t *iter);
 
 // Devuelve clave actual, esa clave no se puede modificar ni liberar.
-const char *abb_iter_ver_actual(const abb_iter_t *iter);
+const char *abb_iter_in_ver_actual(const abb_iter_t *iter);
 
 // Comprueba si terminó la iteración
-bool abb_iter_al_final(const abb_iter_t *iter);
+bool abb_iter_in_al_final(const abb_iter_t *iter);
 
 // Destruye iterador
-void abb_iter_destruir(abb_iter_t* iter);
+void abb_iter_in_destruir(abb_iter_t* iter);
 
 #endif // ABB_H

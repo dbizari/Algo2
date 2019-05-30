@@ -25,7 +25,7 @@ struct abb {
 };
 
 struct abb_iter {
-  abb_t* abb;
+  const abb_t* abb;
   pila_t* pila_aux;
 };
 
@@ -61,9 +61,9 @@ nodo_abb_t* buscar_nodo(const abb_t* arbol, const char* clave, nodo_abb_t ** aux
 
     while(aux_nodo != NULL){
 
-        if(!(arbol->comparar_clave)(aux_nodo->clave, clave))
+        if(!(arbol->comparar_clave)(aux_nodo->clave, clave)) {
             return aux_nodo;
-        else if((arbol->comparar_clave)(aux_nodo->clave, clave) > 0){ // aux_nodo > clave Entonce debo buscar a la izq
+        } else if((arbol->comparar_clave)(aux_nodo->clave, clave) > 0) { // aux_nodo > clave Entonce debo buscar a la izq
             *aux_padre = aux_nodo;
             aux_nodo = aux_nodo->izq;
         }else{
@@ -81,6 +81,13 @@ void print_arbol(nodo_abb_t * nodo){
     printf("%d\n",*(int*)nodo->dato);
     print_arbol(nodo->der);
     return;
+}
+void cambiar_referencia(abb_t* arbol, const char* clave, nodo_abb_t *padre, nodo_abb_t* hijo) {
+  if (arbol->comparar_clave(padre->clave, clave) > 0) {
+    padre->izq = hijo;
+  } else {
+    padre->der = hijo;
+  }
 }
 
 /* *****************************************************************
@@ -135,9 +142,9 @@ abb_t * abb_crear(abb_comparar_clave_t cmp, abb_destruir_dato_t destruir_dato){
 }
 
 bool abb_guardar(abb_t *arbol, const char *clave, void *dato){
-	nodo_abb_t*  aux_nodo, *new, *aux_padre;
+	nodo_abb_t*  aux_nodo, *new, *aux_padre = NULL;
 
-    aux_nodo = buscar_nodo(arbol,clave,&aux_padre);
+  aux_nodo = buscar_nodo(arbol,clave,&aux_padre);
 
 	if (aux_nodo) {
 		void* dato_viejo = aux_nodo->dato;
@@ -146,61 +153,76 @@ bool abb_guardar(abb_t *arbol, const char *clave, void *dato){
 	} else {
 		new = nodo_abb_crear(clave,dato);
         if(!new) return false;
-        if(!arbol->raiz)
+        if(!arbol->raiz) {
             arbol->raiz = new;
-        else if((arbol->comparar_clave)(aux_padre->clave, clave) > 0)
-            aux_padre->izq = new;
-        else
-            aux_padre->der = new;
-
+        } else {
+          cambiar_referencia(arbol, clave, aux_padre, new);
+        }
 		arbol->cantidad++;
-	}
+  }
+
 	return true;
 }
-/*
+
 size_t cant_hijos(nodo_abb_t* aux) {
   if (!aux->der && !aux->izq) return 0;
   if (aux->der && aux->izq) return 2;
   return 1;
 }
-void cambiar_referencia(char* clave, nodo_abb_t *padre, nodo_abb_t* hijo) {
-    if (arbol->comparar_clave(padre->clave, clave) > 0) {
-      padre->izq = hijo;
-    } else {
-      padre->der = hijo;
-    }
+
+void buscar_reemplazante(abb_t* arbol, nodo_abb_t* act, nodo_abb_t* remp) {
+  nodo_abb_t* aux = act->der;
+  while(aux) {
+    remp = aux;
+    aux = aux->izq;
+  }
+
 }
+
 void *abb_borrar(abb_t *arbol, const char *clave) {
   nodo_abb_t* aux_nodo,* padre = NULL;
   void* dato;
   size_t hijos = 0;
 
-  aux_nodo = buscar_nodo(arbol,clave,padre);
+  aux_nodo = buscar_nodo(arbol,clave,&padre);
   if(!aux_nodo) return NULL;
 
   hijos = cant_hijos(aux_nodo);
   dato = aux_nodo->dato;
   if (hijos == 0) {
-    cambiar_referencia(clave, padre, NULL);
+    if (padre) {
+      cambiar_referencia(arbol, clave, padre, NULL);
+    } else {
+      arbol->raiz = NULL;
+    }
   } else if (hijos == 1) {
     nodo_abb_t* hijo;
-    if (aux->izq) {
-      hijo = aux->izq;
+    if (aux_nodo->izq) {
+      hijo = aux_nodo->izq;
     } else {
-      hijo = aux->der;
+      hijo = aux_nodo->der;
     }
-    cambiar_referencia(clave, padre, hijo);
+    if (padre) {
+      cambiar_referencia(arbol, clave, padre, hijo);
+    } else {
+      nodo_abb_t* hijo = aux_nodo->izq ? aux_nodo->izq : aux_nodo->der;
+      arbol->raiz = hijo;
+    }
   } else {
-      buscar_reemplazante(aux_nodo, aux_remp);
+      nodo_abb_t* aux_remp = NULL;
+      buscar_reemplazante(arbol, aux_nodo, aux_remp);
       char* clave_remp = aux_remp->clave;
-      void* dato_remp = abb_borrar(arbol, clave);
+      void* dato_remp = abb_borrar(arbol, clave_remp);
       free(aux_nodo->clave);
       aux_nodo->clave = clave_remp;
       aux_nodo->dato = dato_remp;
   }
-  nodo_abb_destruir(aux,NULL); //No queremos destruir el dato
+  if (hijos == 0 || hijos == 1) {
+    nodo_abb_destruir(aux_nodo,NULL); //No queremos destruir el dato
+    arbol->cantidad--;
+  }
   return dato;
-}*/
+}
 
 void * abb_obtener(const abb_t *arbol, const char *clave){
 	nodo_abb_t * aux_padre = NULL,*aux;
@@ -256,9 +278,11 @@ void _apilar_izq(abb_iter_t* iter, nodo_abb_t* nodo) {
 }
 
 void apilar_izq(abb_iter_t* iter, nodo_abb_t* nodo) {
-  if (!nodo) {
+  if (!nodo && iter->abb->raiz) {
     nodo = iter->abb->raiz;
     pila_apilar(iter->pila_aux, nodo);
+  } else {
+    return;
   }
   _apilar_izq(iter, nodo->izq);
 
@@ -273,7 +297,7 @@ void apilar_izq(abb_iter_t* iter, nodo_abb_t* nodo) {
   if (!pila) return NULL;
 
   iter->pila_aux = pila;
-  //iter->abb = arbol;
+  iter->abb = arbol;
 
   apilar_izq(iter, NULL);
   return iter;
