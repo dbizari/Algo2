@@ -41,28 +41,6 @@ size_t f_hash(const char *str)
     return hash;
 }
 /* *****************************************************************
- *                    PRIMITIVAS DE NODO HASH
- * *****************************************************************/
-
-nodo_hash_t* nodo_hash_crear(const char *clave, void *dato){
-	nodo_hash_t* aux = malloc(sizeof(nodo_hash_t));
-    if(!aux) return NULL;
-
-	aux->clave = malloc(sizeof(char) * (strlen(clave) + 1));
-	if(!aux->clave) {
-		free(aux);
-		return NULL;
-	}
-	strcpy(aux->clave,clave);
-	aux->dato = dato;
-	return aux;
-}
-
-void nodo_hash_destruir(nodo_hash_t* nodo_hash){
-	free(nodo_hash->clave);
-	free(nodo_hash);
-}
-/* *****************************************************************
  *                    FUNCIONES AUXILIARES
  * *****************************************************************/
 char * strdup(const char * str){ //El usuario se encarga de liberar la memoria
@@ -101,15 +79,40 @@ void destruir_tabla(hash_t* hash) {
 	free(hash->tabla);
 }
 
-nodo_hash_t* buscar_nodo(lista_iter_t* iter, const char* clave) {
+/* *****************************************************************
+ *                    PRIMITIVAS DE NODO HASH
+ * *****************************************************************/
+
+nodo_hash_t* nodo_hash_crear(const char *clave, void *dato){
+	nodo_hash_t* aux = malloc(sizeof(nodo_hash_t));
+    if(!aux) return NULL;
+
+	if((aux->clave = strdup(clave)) == NULL){
+		free(aux);
+		return NULL;
+	}
+	aux->dato = dato;
+	return aux;
+}
+
+void nodo_hash_destruir(nodo_hash_t* nodo_hash){
+	free(nodo_hash->clave);
+	free(nodo_hash);
+}
+
+lista_iter_t* buscar_nodo(const hash_t* hash, const char* clave) {
+	size_t pos = f_hash(clave) % hash->tam;
+	lista_iter_t* iter = lista_iter_crear(hash->tabla[pos]);
+	if(!iter) return NULL;
+
 	while (!lista_iter_al_final(iter)) {
 		nodo_hash_t* aux = lista_iter_ver_actual(iter);
 		if (!strcmp(aux->clave, clave)) {
-			return aux;
+			return iter;
 		}
 		lista_iter_avanzar(iter);
 	}
-	return NULL;
+	return iter;
 }
 
 /* *****************************************************************
@@ -173,25 +176,22 @@ bool redimensionar_hash(hash_t * hash,size_t new_size){
 	return status;
 }
 bool hash_guardar(hash_t *hash, const char *clave, void *dato) {
-	nodo_hash_t*  aux;
-	char * aux_str = strdup(clave);
-	size_t pos = f_hash(aux_str) % hash->tam;
-	lista_iter_t* iter = lista_iter_crear(hash->tabla[pos]);
-	if(!iter) return false;
-	free(aux_str);
+	lista_iter_t* iter;
+	nodo_hash_t *aux_nodo;
 
-	aux = buscar_nodo(iter, clave);
-	if (aux) {
-		void* dato_viejo = aux->dato;
-		aux->dato = dato;
+	iter = buscar_nodo(hash, clave);
+	if (!lista_iter_al_final(iter)) {
+		aux_nodo = lista_iter_ver_actual(iter);
+		void* dato_viejo = aux_nodo->dato;
+		aux_nodo->dato = dato;
 		if (hash->destruir_dato != NULL) (hash->destruir_dato)(dato_viejo);
 	} else {
-		aux = nodo_hash_crear(clave,dato);
-		if(!aux){
+		aux_nodo = nodo_hash_crear(clave,dato);
+		if(!aux_nodo){
 			lista_iter_destruir(iter);
 			return false;
 		}
-		lista_iter_insertar(iter,aux);
+		lista_iter_insertar(iter,aux_nodo);
 		hash->cantidad++;
 		if(hash->cantidad > (hash->tam * NUM_REDIMENSION)) {
 			if(!redimensionar_hash(hash,NUM_REDIMENSION*hash->tam)){
@@ -206,18 +206,14 @@ bool hash_guardar(hash_t *hash, const char *clave, void *dato) {
 
 void* hash_borrar(hash_t *hash, const char *clave) {
 	void*         dato;
-	nodo_hash_t*  aux;
-	char * aux_str = strdup(clave);
-	size_t pos = f_hash(aux_str) % hash->tam;
-	lista_iter_t* iter = lista_iter_crear(hash->tabla[pos]);
-	if(!iter) return NULL;
-	free(aux_str);
+	nodo_hash_t*  aux_nodo;
+	lista_iter_t* iter;
 
-	aux = buscar_nodo(iter, clave);
-	if (aux) {
-		aux = lista_iter_ver_actual(iter);
-		dato = aux->dato;
-		nodo_hash_destruir(aux);
+	iter = buscar_nodo(hash, clave);
+	if (!lista_iter_al_final(iter)) {
+		aux_nodo = lista_iter_ver_actual(iter);
+		dato = aux_nodo->dato;
+		nodo_hash_destruir(aux_nodo);
 		hash->cantidad--;
 		lista_iter_borrar(iter);
 		lista_iter_destruir(iter);
@@ -233,37 +229,23 @@ void* hash_borrar(hash_t *hash, const char *clave) {
 }
 
 void * hash_obtener(const hash_t *hash, const char *clave){
-	nodo_hash_t * aux;
-	char * aux_str = strdup(clave);
-	size_t pos = f_hash(aux_str) % hash->tam;
-	lista_iter_t * iter = lista_iter_crear(hash->tabla[pos]);
-	if(!iter) return NULL;
-	free(aux_str);
+	nodo_hash_t * aux_nodo;
+	lista_iter_t * iter;
 
-	aux = buscar_nodo(iter, clave);
-	if (aux) {
-		aux = lista_iter_ver_actual(iter);
-		void* dato = aux->dato;
-		lista_iter_destruir(iter);
-		return dato;
-	}
+	iter = buscar_nodo(hash, clave);
+	aux_nodo = lista_iter_ver_actual(iter);
 	lista_iter_destruir(iter);
-	return NULL;
+	return aux_nodo == NULL ? NULL : aux_nodo->dato;
 }
 
 bool hash_pertenece(const hash_t *hash, const char *clave){
-	char * aux_str = strdup(clave);
-	size_t pos = f_hash(aux_str) % hash->tam;
-	lista_iter_t* iter = lista_iter_crear(hash->tabla[pos]);
-	if(!iter) return NULL;
-	free(aux_str);
+	nodo_hash_t * aux_nodo;
+	lista_iter_t * iter;
 
-	if (buscar_nodo(iter, clave)) {
-		lista_iter_destruir(iter);
-		return true;
-	}
+	iter = buscar_nodo(hash, clave);
+	aux_nodo = lista_iter_ver_actual(iter);
 	lista_iter_destruir(iter);
-	return false;
+	return aux_nodo == NULL ? false : true;
 }
 
 size_t hash_cantidad(const hash_t *hash){
