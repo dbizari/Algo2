@@ -39,23 +39,7 @@ char * strdup(const char * str){ //El usuario se encarga de liberar la memoria
 	strcpy(str2,str);
 	return str2;
 }
-/*
-nodo_abb_t* buscar_nodo(nodo_abb_t* nodo, const char* clave,abb_comparar_clave_t cmp,nodo_abb_t ** aux_padre) {
-    nodo_abb_t* aux;
 
-    if(nodo == NULL) return NULL;
-
-    if(!cmp(nodo->clave, clave))
-        return nodo;
-    else if(cmp(nodo->clave, clave) > 0){ // nodo > clave Entonce debo buscar a la izq
-        *aux_padre = nodo;
-        aux = buscar_nodo(nodo->izq,clave,cmp,aux_padre);
-    }else{
-        *aux_padre = nodo;
-        aux = buscar_nodo(nodo->der,clave,cmp,aux_padre);
-    }
-    return aux;
-}*/
 nodo_abb_t* buscar_nodo(const abb_t* arbol, const char* clave, nodo_abb_t ** aux_padre) {
     nodo_abb_t * aux_nodo = arbol->raiz;
 
@@ -180,7 +164,7 @@ void buscar_reemplazante(abb_t* arbol, nodo_abb_t* act, nodo_abb_t* remp) {
 }
 
 void *abb_borrar(abb_t *arbol, const char *clave) {
-  nodo_abb_t* aux_nodo,* padre = NULL;
+  nodo_abb_t* aux_nodo,* padre = NULL,*hijo;
   void* dato;
   size_t hijos = 0;
 
@@ -196,7 +180,6 @@ void *abb_borrar(abb_t *arbol, const char *clave) {
       arbol->raiz = NULL;
     }
   } else if (hijos == 1) {
-    nodo_abb_t* hijo;
     if (aux_nodo->izq) {
       hijo = aux_nodo->izq;
     } else {
@@ -205,7 +188,7 @@ void *abb_borrar(abb_t *arbol, const char *clave) {
     if (padre) {
       cambiar_referencia(arbol, clave, padre, hijo);
     } else {
-      nodo_abb_t* hijo = aux_nodo->izq ? aux_nodo->izq : aux_nodo->der;
+      hijo = aux_nodo->izq ? aux_nodo->izq : aux_nodo->der;
       arbol->raiz = hijo;
     }
   } else {
@@ -238,7 +221,7 @@ bool abb_pertenece(const abb_t *arbol, const char *clave){
 	return (buscar_nodo(arbol,clave,&aux_padre) != NULL);
 }
 
-size_t abb_cantidad(const abb_t *arbol){
+size_t abb_cantidad(abb_t *arbol){
 	return arbol->cantidad;
 }
 
