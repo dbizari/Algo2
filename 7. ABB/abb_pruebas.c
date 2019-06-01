@@ -135,9 +135,9 @@ static void prueba_abb_borrar()
     printf("\nPRUEBAS BORRAR\n");
     abb_t* abb = abb_crear(strcmp, NULL);
 
-    char *clave1 = "perro", *valor1 = "guau";
-    char *clave2 = "gato", *valor2 = "miau";
-    char *clave3 = "vaca", *valor3 = "mu";
+    char *clave1 = "2", *valor1 = "guau";
+    char *clave2 = "1", *valor2 = "miau";
+    char *clave3 = "3", *valor3 = "mu";
 
     // Inserta 3 valores y luego los borra
     print_test("Prueba abb insertar clave1", abb_guardar(abb, clave1, valor1));
@@ -145,18 +145,18 @@ static void prueba_abb_borrar()
     print_test("Prueba abb insertar clave3", abb_guardar(abb, clave3, valor3));
 
     // Al borrar cada elemento comprueba que ya no está pero los otros sí.
-    print_test("Prueba abb pertenece clave3, es verdadero", abb_pertenece(abb, clave3));
-    print_test("Prueba abb borrar clave3, es valor3", abb_borrar(abb, clave3) == valor3);
-    print_test("Prueba abb borrar clave3, es NULL", !abb_borrar(abb, clave3));
-    print_test("Prueba abb pertenece clave3, es falso", !abb_pertenece(abb, clave3));
-    print_test("Prueba abb obtener clave3, es NULL", !abb_obtener(abb, clave3));
-    print_test("Prueba abb la cantidad de elementos es 2", abb_cantidad(abb) == 2);
-
     print_test("Prueba abb pertenece clave1, es verdadero", abb_pertenece(abb, clave1));
     print_test("Prueba abb borrar clave1, es valor1", abb_borrar(abb, clave1) == valor1);
     print_test("Prueba abb borrar clave1, es NULL", !abb_borrar(abb, clave1));
     print_test("Prueba abb pertenece clave1, es falso", !abb_pertenece(abb, clave1));
     print_test("Prueba abb obtener clave1, es NULL", !abb_obtener(abb, clave1));
+    print_test("Prueba abb la cantidad de elementos es 2", abb_cantidad(abb) == 2);
+
+    print_test("Prueba abb pertenece clave3, es verdadero", abb_pertenece(abb, clave3));
+    print_test("Prueba abb borrar clave3, es valor3", abb_borrar(abb, clave3) == valor3);
+    print_test("Prueba abb borrar clave3, es NULL", !abb_borrar(abb, clave3));
+    print_test("Prueba abb pertenece clave3, es falso", !abb_pertenece(abb, clave3));
+    print_test("Prueba abb obtener clave3, es NULL", !abb_obtener(abb, clave3));
     print_test("Prueba abb la cantidad de elementos es 1", abb_cantidad(abb) == 1);
 
     print_test("Prueba abb pertenece clave2, es verdadero", abb_pertenece(abb, clave2));
