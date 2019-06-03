@@ -246,6 +246,7 @@ void abb_destruir(abb_t *arbol){
 void _abb_in_order(nodo_abb_t* nodo, bool visitar(const char* clave, void* dato, void* extra), void* extra, bool estado) {
   if (!nodo) return;
   _abb_in_order(nodo->izq, visitar, extra, estado);
+  if (!estado) return;
   estado = visitar(nodo->clave, nodo->dato, extra);
   if (!estado) return;
   _abb_in_order(nodo->der, visitar, extra, estado);
