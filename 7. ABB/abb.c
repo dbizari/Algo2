@@ -147,7 +147,7 @@ bool abb_guardar(abb_t *arbol, const char *clave, void *dato){
 
 	return true;
 }
-
+/*
 size_t cant_hijos(nodo_abb_t* aux) {
   if (!aux->der && !aux->izq) return 0;
   if (aux->der && aux->izq) return 2;
@@ -193,7 +193,7 @@ bool _borrar_caso_2(abb_t* arbol, nodo_abb_t* nodo, nodo_abb_t* padre) {
   return true;
 }
 
-void* abb_borrar(abb_t* arbol, const char* clave) {
+void* abb_borrar(abb_t* arbol, const char* clave){
   nodo_abb_t* aux_nodo, *padre = NULL;
   void* dato;
   size_t hijos = 0;
@@ -211,7 +211,7 @@ void* abb_borrar(abb_t* arbol, const char* clave) {
   if (hijos == 0 || hijos == 1)arbol->cantidad--;
   return dato;
 }
-
+*/
 /*void *abb_borrar(abb_t *arbol, const char *clave) {
   nodo_abb_t* aux_nodo,* padre = NULL;
   void* dato;
@@ -255,6 +255,79 @@ void* abb_borrar(abb_t* arbol, const char* clave) {
   }
   return dato;
 }*/
+size_t get_cant_hijos(nodo_abb_t* aux) {
+  if (!aux->der && !aux->izq) return 0;
+  if (aux->der && aux->izq) return 2;
+  return 1;
+}
+
+nodo_abb_t * buscar_reemplazante(nodo_abb_t* act){
+  nodo_abb_t* remp,*aux = act->der;
+
+  while(aux) {
+    remp = aux;
+    aux = aux->izq;
+  }
+  return remp;
+}
+
+void* abb_borrar(abb_t* arbol, const char* clave){
+    nodo_abb_t * aux_padre = NULL,*aux_nodo,*remp = NULL;
+    size_t cant_hijos;
+    void * dato;
+    char * aux_clave;
+
+    if((aux_nodo = buscar_nodo(arbol,clave,&aux_padre)) == NULL)
+        return NULL;
+
+    dato = aux_nodo->dato;
+    if(arbol->cantidad == 1){
+        nodo_abb_destruir(aux_nodo,arbol->destruir_dato);
+        arbol->raiz = NULL;
+        arbol->cantidad--;
+        return dato;
+    }
+    cant_hijos = get_cant_hijos(aux_nodo);
+    if(cant_hijos == 0){
+        if(aux_padre->der != NULL && !(arbol->comparar_clave)(clave,aux_padre->der->clave)){
+            aux_padre->der = NULL;
+        }
+        else{
+            aux_padre->izq = NULL;
+        }
+        nodo_abb_destruir(aux_nodo,arbol->destruir_dato);
+        arbol->cantidad--;
+    } else if(cant_hijos == 1){
+        if(arbol->raiz == aux_nodo){
+            if(aux_nodo->der != NULL)
+                arbol->raiz = aux_nodo->der;
+            else
+                arbol->raiz = aux_nodo->izq;
+        }else{
+            if(aux_nodo->der != NULL && !(arbol->comparar_clave)(clave,aux_nodo->der->clave)){
+                if(aux_padre->der != NULL && !(arbol->comparar_clave)(aux_nodo->clave,aux_padre->der->clave))
+                aux_padre->der = aux_nodo->der;
+                else
+                aux_padre->izq = aux_nodo->der;
+            }
+            else{
+                if(aux_padre->der != NULL && !(arbol->comparar_clave)(aux_nodo->clave,aux_padre->der->clave))
+                    aux_padre->der = aux_nodo->izq;
+                else
+                    aux_padre->izq = aux_nodo->izq;
+            }
+        }
+        nodo_abb_destruir(aux_nodo,arbol->destruir_dato);
+        arbol->cantidad--;
+    } else{
+        remp = buscar_reemplazante(aux_nodo);
+        aux_clave = strdup(remp->clave);
+        aux_nodo->dato = abb_borrar(arbol,remp->clave);
+        free(aux_nodo->clave);
+        aux_nodo->clave = aux_clave;
+    }
+    return dato;
+}
 
 void * abb_obtener(const abb_t *arbol, const char *clave){
 	nodo_abb_t * aux_padre = NULL,*aux;
