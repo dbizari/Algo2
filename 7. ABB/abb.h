@@ -58,6 +58,8 @@ size_t abb_cantidad(abb_t *arbol);
 void abb_destruir(abb_t *arbol);
 
 /* Iterador del abb */
+//iterador interno
+void abb_in_order(abb_t *arbol, bool visitar(const char *, void *, void *), void *extra);
 
 // Crea iterador
 abb_iter_t *abb_iter_in_crear(const abb_t *arbol);

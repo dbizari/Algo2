@@ -138,11 +138,13 @@ static void prueba_abb_borrar()
     char *clave1 = "2", *valor1 = "guau";
     char *clave2 = "1", *valor2 = "miau";
     char *clave3 = "3", *valor3 = "mu";
+    char *clave4 = "4", *valor4 = "hola";
 
     // Inserta 3 valores y luego los borra
     print_test("Prueba abb insertar clave1", abb_guardar(abb, clave1, valor1));
     print_test("Prueba abb insertar clave2", abb_guardar(abb, clave2, valor2));
     print_test("Prueba abb insertar clave3", abb_guardar(abb, clave3, valor3));
+    print_test("Prueba abb insertar clave4", abb_guardar(abb, clave4, valor4));
 
     // Al borrar cada elemento comprueba que ya no está pero los otros sí.
     print_test("Prueba abb pertenece clave1, es verdadero", abb_pertenece(abb, clave1));
@@ -150,21 +152,21 @@ static void prueba_abb_borrar()
     print_test("Prueba abb borrar clave1, es NULL", !abb_borrar(abb, clave1));
     print_test("Prueba abb pertenece clave1, es falso", !abb_pertenece(abb, clave1));
     print_test("Prueba abb obtener clave1, es NULL", !abb_obtener(abb, clave1));
-    print_test("Prueba abb la cantidad de elementos es 2", abb_cantidad(abb) == 2);
+    print_test("Prueba abb la cantidad de elementos es 3", abb_cantidad(abb) == 3);
 
     print_test("Prueba abb pertenece clave3, es verdadero", abb_pertenece(abb, clave3));
     print_test("Prueba abb borrar clave3, es valor3", abb_borrar(abb, clave3) == valor3);
     print_test("Prueba abb borrar clave3, es NULL", !abb_borrar(abb, clave3));
     print_test("Prueba abb pertenece clave3, es falso", !abb_pertenece(abb, clave3));
     print_test("Prueba abb obtener clave3, es NULL", !abb_obtener(abb, clave3));
-    print_test("Prueba abb la cantidad de elementos es 1", abb_cantidad(abb) == 1);
+    print_test("Prueba abb la cantidad de elementos es 2", abb_cantidad(abb) == 2);
 
     print_test("Prueba abb pertenece clave2, es verdadero", abb_pertenece(abb, clave2));
     print_test("Prueba abb borrar clave2, es valor2", abb_borrar(abb, clave2) == valor2);
     print_test("Prueba abb borrar clave2, es NULL", !abb_borrar(abb, clave2));
     print_test("Prueba abb pertenece clave2, es falso", !abb_pertenece(abb, clave2));
     print_test("Prueba abb obtener clave2, es NULL", !abb_obtener(abb, clave2));
-    print_test("Prueba abb la cantidad de elementos es 0", abb_cantidad(abb) == 0);
+    print_test("Prueba abb la cantidad de elementos es 1", abb_cantidad(abb) == 1);
 
     abb_destruir(abb);
 }
@@ -328,6 +330,7 @@ static void prueba_abb_iterar()
 
 static void prueba_abb_iterar_volumen(size_t largo)
 {
+    printf("\nPRUEBAS ITERAR VOLUMEN\n");
     abb_t* abb = abb_crear(strcmp,NULL);
 
     const size_t largo_clave = 10;
@@ -389,6 +392,44 @@ static void prueba_abb_iterar_volumen(size_t largo)
     abb_destruir(abb);
 }
 
+bool sumar_todos(const char* clave, void* dato, void* extra) {
+	*(int*)extra+= *(int*)dato;
+	return true;
+}
+
+bool sumar_clave_menor_6(const char* clave, void* dato, void* extra) {
+  if (strcmp(clave, "6") > 0) {
+    return false;
+  }
+  *(int*)extra+= *(int*)dato;
+  return true;
+}
+
+static void pruebas_iterador_interno() {
+  printf("\nPRUEBAS ITERADOR INTERNO\n");
+  abb_t* abb = abb_crear(strcmp, NULL);
+  char *clave1 = "5";
+  int valor1 = 3;
+  char *clave2 = "1";
+  int valor2 = 2;
+  char *clave3 = "7";
+  int valor3 = 1;
+
+  abb_guardar(abb, clave1, &valor1);
+  abb_guardar(abb, clave2, &valor2);
+  abb_guardar(abb, clave3, &valor3);
+
+  int suma = 0;
+  abb_in_order(abb, sumar_todos, &suma);
+  print_test("Iterar sin corte es correcto", suma == 6);
+
+  suma = 0;
+  abb_in_order(abb, sumar_clave_menor_6, &suma);
+  print_test("Iterar con corte es correcto", suma == 5);
+
+  abb_destruir(abb);
+
+}
 
 /* ******************************************************************
  *                        FUNCIÓN PRINCIPAL
@@ -409,9 +450,5 @@ void pruebas_abb_alumno()
     prueba_abb_volumen(1000, true);
     prueba_abb_iterar();
     prueba_abb_iterar_volumen(1000);
+    pruebas_iterador_interno();
 }
-//Fijarse lo de abajo que onda
-/*void pruebas_volumen_catedra(size_t largo)
-{
-    prueba_abb_volumen(largo, false);
-}*/
