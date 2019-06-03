@@ -196,7 +196,7 @@ bool _borrar_caso_2(abb_t* arbol, nodo_abb_t* nodo, nodo_abb_t* padre) {
   return true;
 }
 
-void* abb_borrar(abb_t* arbol, const char* clave) {
+void* abb_borrar(abb_t* arbol, const char* clave){
   nodo_abb_t* aux_nodo, *padre = NULL;
   void* dato;
   size_t hijos = 0;
