@@ -28,7 +28,7 @@ void swap(void** dato1, void** dato2){
 void upheap(heap_t * heap,size_t pos){
 	if(pos == 0) return;
 	size_t padre = (pos - 1) / 2;
-	if((heap->cmp)(heap->datos[padre],heap->datos[pos]) > 0){
+	if((heap->cmp)(heap->datos[padre],heap->datos[pos]) < 0){
 		swap(&heap->datos[padre],&heap->datos[pos]);
 		upheap(heap,padre);
 	}
@@ -36,17 +36,17 @@ void upheap(heap_t * heap,size_t pos){
 
 void downheap(void *arreglo[],size_t pos, cmp_func_t cmp, size_t cant){
 	if(pos >= cant) return;
-	size_t min = pos;
+	size_t max = pos;
 	size_t izq = 2 * pos + 1;
-	size_t der = 2 * pos + 1;
+	size_t der = 2 * pos + 2;
 
-	if(izq < cant && cmp(arreglo[izq],arreglo[min]) < 0)
-		min = izq;
-	if(der < cant && cmp(arreglo[der],arreglo[min]) < 0)
-		min = der;
-	if(min != pos){
-		swap(&arreglo[min],&arreglo[pos]);
-		downheap(arreglo,min, cmp, cant);
+	if(izq < cant && cmp(arreglo[izq],arreglo[max]) > 0)
+		max = izq;
+	if(der < cant && cmp(arreglo[der],arreglo[max]) > 0)
+		max = der;
+	if(max != pos){
+		swap(&arreglo[max],&arreglo[pos]);
+		downheap(arreglo,max, cmp, cant);
 	}
 }
 
@@ -166,9 +166,9 @@ void *heap_desencolar(heap_t *heap){
 	if(heap_esta_vacio(heap)) return NULL;
 	void * dato = heap->datos[0];
 
-	swap(&heap->datos[0],&heap->datos[--heap->cantidad]);
+	heap->cantidad--;
+	swap(&heap->datos[0],&heap->datos[heap->cantidad]);
 	downheap(heap->datos, 0, heap->cmp, heap->cantidad);
-	heap->datos[heap->cantidad] = NULL;
 	if(heap->cantidad == (heap->capacidad / 4)){
 		if(heap_redimensionar(heap, heap->capacidad / SCALE_FACTOR) == false)
             return false;
