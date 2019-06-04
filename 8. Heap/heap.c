@@ -51,8 +51,9 @@ void downheap(void *arreglo[],size_t pos, cmp_func_t cmp, size_t cant){
 }
 
 void heapify(void* arreglo[], size_t n, cmp_func_t cmp) {
-	size_t pos = n/2 - 1;
-	downheap(arreglo, pos, cmp, n);
+	for (i = n/2 - 1; i >= 0 ; i--) {
+		downheap(arreglo, i, cmp, n);
+	}
 }
 /* *****************************************************************
  *                    PRIMITIVAS DE HEAP

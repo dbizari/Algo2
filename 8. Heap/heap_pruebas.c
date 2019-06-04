@@ -11,7 +11,11 @@ int comparar_int(const void *a, const void *b) {
     return -1;
   }
 }
-static void prueba_heap_vacio() {
+
+void destruir_dato(void * dato){
+    free(dato);
+}
+void prueba_heap_vacio() {
 
   printf("\nPRUEBAS HEAP VACIO\n");
 
@@ -26,8 +30,58 @@ static void prueba_heap_vacio() {
   print_test("Se destruyo el heap", true);
 
 }
+void prueba_un_elemento(){
+    cola_t* cola = cola_crear();
+    int num=10;
+    char letra='a';
+    long num_long;
+    char palabra[10]="Test";
 
-static void prueba_heap_sin_arreglo() {
+    //Pruebas con int
+    print_test("Encolar int", cola_encolar(cola,&num) == true);
+    print_test("Ver primero", cola_ver_primero(cola) == &num);
+    print_test("Cola esta vacia?", cola_esta_vacia(cola) == false);
+    print_test("Desencolar int", cola_desencolar(cola) == &num);
+    //Pruebas con char
+    print_test("Encolar char", cola_encolar(cola,&letra) == true);
+    print_test("Ver primero", cola_ver_primero(cola) == &letra);
+    print_test("Cola esta vacia?", cola_esta_vacia(cola) == false);
+    print_test("Desencolar char", cola_desencolar(cola) == &letra);
+    //Pruebas con NULL
+    print_test("Encolar NULL", cola_encolar(cola,NULL) == true);
+    print_test("Ver primero", cola_ver_primero(cola) == NULL);
+    print_test("Cola esta vacia?", cola_esta_vacia(cola) == false);
+    print_test("Desencolar NULL", cola_desencolar(cola) == NULL);
+    //Pruebas con long
+    print_test("Encolar long", cola_encolar(cola,&num_long) == true);
+    print_test("Ver primero", cola_ver_primero(cola) == &num_long);
+    print_test("Cola esta vacia?", cola_esta_vacia(cola) == false);
+    print_test("Desencolar long", cola_desencolar(cola) == &num_long);
+    //Pruebas con string
+    print_test("Encolar string", cola_encolar(cola,palabra) == true);
+    print_test("Ver primero", cola_ver_primero(cola) == palabra);
+    print_test("Cola esta vacia?", cola_esta_vacia(cola) == false);
+    print_test("Desencolar string", cola_desencolar(cola) == palabra);
+    //Destruir cola con pila
+    pila_t* pila = pila_crear();
+
+    if(!pila){
+        cola_destruir(cola,NULL);
+        return;
+    }
+    if((pila_apilar(pila,&num)) == false){
+        cola_destruir(cola,NULL);
+        return;
+    }
+    print_test("Encolar pila", cola_encolar(cola,pila) == true);
+    print_test("Ver primero", cola_ver_primero(cola) == pila);
+    print_test("Cola esta vacia?", cola_esta_vacia(cola) == false);
+    cola_destruir(cola,destruir_pila);
+    print_test("Destruir cola con una pila",true);
+    return;
+}
+
+void prueba_heap_sin_arreglo() {
   printf("\nPRUEBAS HEAP CON FUNCION HEAP CREAR\n");
 
   int v[3] = {5,2,8};
@@ -50,7 +104,6 @@ static void prueba_heap_sin_arreglo() {
   print_test("Desencolar devuelve el maximo", heap_desencolar(heap) == &v[2]);
   print_test("La cantidad de elementos es 3", heap_cantidad(heap) == 3);
   print_test("Ver maximo devuelve el elemento correcto", heap_ver_max(heap) == &v[0]);
-  printf("MAXIMOOOOO: %d\n",*(int*)heap_ver_max(heap) );
   print_test("Desencolar devuelve el maximo", heap_desencolar(heap) == &v[0]);
   print_test("La cantidad de elementos es 2", heap_cantidad(heap) == 2);
   print_test("Ver maximo devuelve el elemento correcto", heap_ver_max(heap) == &v[1]);
