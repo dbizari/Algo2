@@ -6,7 +6,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>  // For ssize_t in Linux.
-
+#include <time.h>
 
 /* ******************************************************************
  *                        PRUEBAS UNITARIAS
@@ -215,12 +215,12 @@ static void prueba_abb_volumen(size_t largo, bool debug)
     char (*claves)[largo_clave] = malloc(largo * largo_clave);
 
     unsigned* valores[largo];
-
+    srand((unsigned int)time(0)); //Inicializo random
     // Inserta 'largo' parejas en el abb
     bool ok = true;
     for (unsigned i = 0; i < largo; i++) {
         valores[i] = malloc(sizeof(int));
-        sprintf(claves[i], "%08d", i);
+        sprintf(claves[i], "%08d", (unsigned int)(rand() % (int)largo));
         *valores[i] = i;
         ok = abb_guardar(abb, claves[i], valores[i]);
         if (!ok) break;
@@ -340,8 +340,10 @@ static void prueba_abb_iterar_volumen(size_t largo)
 
     // Inserta 'largo' parejas en el abb
     bool ok = true;
+    srand((unsigned int)time(0)); //Inicializo random
+
     for (unsigned i = 0; i < largo; i++) {
-        sprintf(claves[i], "%08d", i);
+        sprintf(claves[i], "%08d", (unsigned int)(rand() % (int)largo));
         valores[i] = i;
         ok = abb_guardar(abb, claves[i], &valores[i]);
         if (!ok) break;
