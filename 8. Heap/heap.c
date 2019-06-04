@@ -19,8 +19,8 @@ struct heap{
 /* *****************************************************************
  *                    FUNCIONES AUXILIARES
  * *****************************************************************/
-void swap(void ** dato1, void** dato2){
-	void * aux = *dato1;
+void swap(void** dato1, void** dato2){
+	void* aux = *dato1;
 	*dato1 = *dato2;
 	*dato2 = aux;
 }
@@ -28,26 +28,31 @@ void swap(void ** dato1, void** dato2){
 void upheap(heap_t * heap,size_t pos){
 	if(pos == 0) return;
 	size_t padre = (pos - 1) / 2;
-	if(heap->cmp(heap->datos[padre],heap->datos[pos]) > 0){
+	if((heap->cmp)(heap->datos[padre],heap->datos[pos]) > 0){
 		swap(&heap->datos[padre],&heap->datos[pos]);
 		upheap(heap,padre);
 	}
 }
 
-void downheap(heap_t * heap,size_t pos){
-	if(pos >= heap->cantidad) return;
+void downheap(void *arreglo[],size_t pos, cmp_func_t cmp, size_t cant){
+	if(pos >= cant) return;
 	size_t min = pos;
 	size_t izq = 2 * pos + 1;
 	size_t der = 2 * pos + 1;
 
-	if(izq < heap->cantidad && heap->cmp(heap->datos[izq],heap->datos[min]) < 0)
+	if(izq < cant && cmp(arreglo[izq],arreglo[min]) < 0)
 		min = izq;
-	if(der < heap->cantidad && heap->cmp(heap->datos[der],heap->datos[min]) < 0)
+	if(der < cant && cmp(arreglo[der],arreglo[min]) < 0)
 		min = der;
 	if(min != pos){
-		swap(&heap->datos[min],&heap->datos[pos]);
-		downheap(heap,min);
+		swap(&arreglo[min],&arreglo[pos]);
+		downheap(arreglo,min, cmp, cant);
 	}
+}
+
+void heapify(void* arreglo[], size_t n, cmp_func_t cmp) {
+	size_t pos = n/2 - 1;
+	downheap(arreglo, pos, cmp, n);
 }
 /* *****************************************************************
  *                    PRIMITIVAS DE HEAP
@@ -69,6 +74,7 @@ heap_t *heap_crear(cmp_func_t cmp){
 	}
 	heap->cantidad = 0;
 	heap->capacidad = SIZE_INIT;
+	heap->cmp = cmp;
 	return heap;
 }
 
@@ -80,7 +86,17 @@ heap_t *heap_crear(cmp_func_t cmp){
  * Excepto por la complejidad, es equivalente a crear un heap vacío y encolar
  * los valores de uno en uno
 */
-heap_t *heap_crear_arr(void *arreglo[], size_t n, cmp_func_t cmp); //HEAPIFY!!!
+heap_t *heap_crear_arr(void *arreglo[], size_t n, cmp_func_t cmp) {
+	heap_t* heap = heap_crear(cmp);
+	if (!heap) return NULL;
+	for (size_t i = 0; i<n; i++) {
+		heap->datos[i] = arreglo[i];
+		heap->cantidad++;
+	}
+	heapify(heap->datos, n, cmp);
+	return heap;
+
+}//HEAPIFY!!!
 
 /* Elimina el heap, llamando a la función dada para cada elemento del mismo.
  * El puntero a la función puede ser NULL, en cuyo caso no se llamará.
@@ -105,7 +121,7 @@ size_t heap_cantidad(const heap_t *heap){
 /* Devuelve true si la cantidad de elementos que hay en el heap es 0, false en
  * caso contrario. */
 bool heap_esta_vacio(const heap_t *heap){
-	return (heap->cantidad == 0);
+	return !heap->cantidad;
 }
 
 bool heap_redimensionar(heap_t *heap, size_t cantidad){
@@ -151,7 +167,7 @@ void *heap_desencolar(heap_t *heap){
 	void * dato = heap->datos[0];
 
 	swap(&heap->datos[0],&heap->datos[--heap->cantidad]);
-	downheap(heap,0);
+	downheap(heap->datos, 0, heap->cmp, heap->cantidad);
 	heap->datos[heap->cantidad] = NULL;
 	if(heap->cantidad == (heap->capacidad / 4)){
 		if(heap_redimensionar(heap, heap->capacidad / SCALE_FACTOR) == false)
