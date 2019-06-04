@@ -243,17 +243,15 @@ void abb_destruir(abb_t *arbol){
   *                 PRIMITIVAS DE ITERADOR INTERNO
   ******************************************************************/
 
-void _abb_in_order(nodo_abb_t* nodo, bool visitar(const char* clave, void* dato, void* extra), void* extra, bool estado) {
-  if (!nodo) return;
-  _abb_in_order(nodo->izq, visitar, extra, estado);
-  if (!estado) return;
-  estado = visitar(nodo->clave, nodo->dato, extra);
-  if (!estado) return;
-  _abb_in_order(nodo->der, visitar, extra, estado);
+bool _abb_in_order(nodo_abb_t* nodo, bool visitar(const char* clave, void* dato, void* extra), void* extra) {
+  if (!nodo) return true;
+  if (!_abb_in_order(nodo->izq, visitar, extra)) return false;
+  if (!visitar(nodo->clave, nodo->dato, extra)) return false;
+  return _abb_in_order(nodo->der, visitar, extra);
 }
+
 void abb_in_order(abb_t *arbol, bool visitar(const char* clave, void* dato, void* extra), void *extra) {
-  bool estado = true;
-  _abb_in_order(arbol->raiz, visitar, extra, estado);
+  _abb_in_order(arbol->raiz, visitar, extra);
 
 }
 
@@ -270,13 +268,10 @@ void _apilar_izq(abb_iter_t* iter, nodo_abb_t* nodo) {
 }
 
 void apilar_izq(abb_iter_t* iter, nodo_abb_t* nodo) {
-  if (!nodo && iter->abb->raiz) {
-    nodo = iter->abb->raiz;
+  if (nodo) {
     pila_apilar(iter->pila_aux, nodo);
-  } else {
-    return;
+    _apilar_izq(iter, nodo->izq);
   }
-  _apilar_izq(iter, nodo->izq);
 
 }
 // fin de funciones auxiliares
@@ -291,17 +286,14 @@ void apilar_izq(abb_iter_t* iter, nodo_abb_t* nodo) {
   iter->pila_aux = pila;
   iter->abb = arbol;
 
-  apilar_izq(iter, NULL);
+  apilar_izq(iter, arbol->raiz);
   return iter;
 }
 
 bool abb_iter_in_avanzar(abb_iter_t *iter) {
   if (pila_esta_vacia(iter->pila_aux)) return false;
   nodo_abb_t* aux = pila_desapilar(iter->pila_aux);
-  if (aux->der) {
-    pila_apilar(iter->pila_aux, aux->der);
-    apilar_izq(iter, aux->der);
-  }
+  apilar_izq(iter, aux->der);
   return true;
 }
 
