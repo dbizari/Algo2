@@ -215,12 +215,12 @@ static void prueba_abb_volumen(size_t largo, bool debug)
     char (*claves)[largo_clave] = malloc(largo * largo_clave);
 
     unsigned* valores[largo];
-    srand((unsigned int)time(0)); //Inicializo random
+    unsigned int claves_HC[9] = {5000,2000,6000,1000,7000,3000,8000,4000,9000};
     // Inserta 'largo' parejas en el abb
     bool ok = true;
     for (unsigned i = 0; i < largo; i++) {
         valores[i] = malloc(sizeof(int));
-        sprintf(claves[i], "%08d", (unsigned int)(rand() % (int)largo));
+        sprintf(claves[i], "%08d", (unsigned int)(claves_HC[i % 8] + i));
         *valores[i] = i;
         ok = abb_guardar(abb, claves[i], valores[i]);
         if (!ok) break;
@@ -340,10 +340,10 @@ static void prueba_abb_iterar_volumen(size_t largo)
 
     // Inserta 'largo' parejas en el abb
     bool ok = true;
-    srand((unsigned int)time(0)); //Inicializo random
+    unsigned int claves_HC[9] = {5000,2000,6000,1000,7000,3000,8000,4000,9000};
 
     for (unsigned i = 0; i < largo; i++) {
-        sprintf(claves[i], "%08d", (unsigned int)(rand() % (int)largo));
+        sprintf(claves[i], "%08d", (unsigned int)(claves_HC[i % 8] + i));
         valores[i] = i;
         ok = abb_guardar(abb, claves[i], &valores[i]);
         if (!ok) break;

@@ -128,7 +128,7 @@ abb_t * abb_crear(abb_comparar_clave_t cmp, abb_destruir_dato_t destruir_dato){
 bool abb_guardar(abb_t *arbol, const char *clave, void *dato){
 	nodo_abb_t*  aux_nodo, *new, *aux_padre = NULL;
 
-  aux_nodo = buscar_nodo(arbol,clave,&aux_padre);
+    aux_nodo = buscar_nodo(arbol,clave,&aux_padre);
 
 	if (aux_nodo) {
 		void* dato_viejo = aux_nodo->dato;
