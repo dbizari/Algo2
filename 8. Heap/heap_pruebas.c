@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stddef.h>
+#include <time.h>
 #include "testing.h"
 #include "heap.h"
 
@@ -161,6 +162,61 @@ void prueba_heap_constructor(){
 
 }
 
+void prueba_volumen(){
+  printf("\nPRUEBAS HEAP VOLUMEN\n");
+  size_t length = 5000;
+  int * arr_aux = malloc(sizeof(int) * length);
+  if(!arr_aux) return;
+  int max = 0;
+  bool status=true;
+  heap_t * heap = heap_crear(comparar_int);
+  if(!heap) return;
+  
+  srand((unsigned int)time(0));
+  for (int i = 0; i < (length-1); i++) {
+      arr_aux[i] = rand() % 1000;
+      if(max < arr_aux[i])
+          max = arr_aux[i];
+      
+      if(i==length/2){
+        arr_aux[i]=1200;
+      }
+    
+      if(!heap_encolar(heap, &arr_aux[i])){
+          status = false;
+          break;
+      }
+  }
+  arr_aux[length-1]=1100;
+  
+  if(!heap_encolar(heap, &arr_aux[length-1])){
+          status = false;
+      }    
+  print_test("Se encolaron 5000 numeros random", status);
+  if(!status)
+      return;
+
+  print_test("El heap esta vacio", !heap_esta_vacio(heap));
+  print_test("La cantidad de elementos es 5000", heap_cantidad(heap) == length);
+  print_test("Verificar maximo", *(int*)heap_ver_max(heap) == 1200);
+  print_test("Desencolar devuelve el maximo", *(int*)heap_desencolar(heap) == 1200);
+  print_test("Verificar maximo", *(int*)heap_ver_max(heap) == 1100);
+  print_test("Desencolar devuelve el maximo", *(int*)heap_desencolar(heap) == 1100);
+  print_test("Verificar maximo", *(int*)heap_ver_max(heap) == max);
+  print_test("Desencolar devuelve el maximo", *(int*)heap_desencolar(heap) == max);
+  print_test("La cantidad de elementos es 5000", heap_cantidad(heap) == length-3);
+  
+  
+
+  heap_destruir(heap, NULL);
+  free(arr_aux);
+  print_test("Se destruyo el heap", true);
+  /*for (int i = 0; i < length; i++){
+    printf("ARRAY: %d\n",arr_aux[i]);
+  }
+  printf("MAX: %d\n",max);*/
+}
+
 void pruebas_heapsort() {
   void ** array = malloc(sizeof(void **) * 5);
   if(!array) return;
@@ -196,5 +252,6 @@ void pruebas_heap_alumno(void) {
   prueba_un_elemento();
   prueba_heap_varios();
   prueba_heap_constructor();
+  prueba_volumen();
  // pruebas_heapsort();
 }
