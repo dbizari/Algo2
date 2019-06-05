@@ -50,9 +50,11 @@ void downheap(void *arreglo[],size_t pos, cmp_func_t cmp, size_t cant){
 	}
 }
 
-void heapify(heap_t* heap){
-	for (int i = (int)(heap->cantidad/2 - 1); i >= 0 ; i--) {
-		downheap(heap->datos, (size_t)i, heap->cmp, heap->cantidad);
+void heapify(void* arreglo[], size_t n, cmp_func_t cmp){
+	int i = (int)n/2 - 1;
+	for (; i >= 0; i--) {
+		printf("%d", i);
+		downheap(arreglo,(int)i, cmp, n);
 	}
 }
 /* *****************************************************************
@@ -89,21 +91,12 @@ heap_t *heap_crear(cmp_func_t cmp){
 */
 heap_t *heap_crear_arr(void *arreglo[], size_t n, cmp_func_t cmp) {
 	if(!cmp) return NULL;
-	heap_t *heap = malloc(sizeof(heap_t));
-	if (!heap) return NULL;
-
-	heap->datos = malloc(sizeof(void *) * (n + 1));
-	if(!heap->datos){
-		free(heap);
-		return NULL;
-	}
-	for (size_t i = 0; i < n; i++){
+	heap_t* heap = heap_crear(cmp); //uso heap crear porque sino redimensionar
+	for (size_t i = 0; i < n; i++){ //el arreglo mucho al principio
 		heap->datos[i] = arreglo[i];
 	}
 	heap->cantidad = n;
-	heap->capacidad = n + 1;
-	heap->cmp = cmp;
-	heapify(heap);
+	heapify(heap->datos, n, cmp);
 	return heap;
 }
 
@@ -185,4 +178,21 @@ void *heap_desencolar(heap_t *heap){
             return false;
 	}
 	return dato;
+}
+
+
+void heap_sort(void *elementos[], size_t cant, cmp_func_t cmp) {
+	heapify(elementos, cant, cmp);
+	for (size_t i = 0; i < cant; i++) {
+			if (cant-1-i == 0) break;
+			swap(&elementos[0],&elementos[cant-1-i]);
+			printf("%d: posicion ult\n", *(int*)elementos[cant-1-i]);
+			printf("%d : antes del down\n", *(int*)elementos[0]);
+			downheap(elementos, 0, cmp, cant-1-i);
+			printf("%d : despues de downheap\n", *(int*)elementos[0]);
+			printf("%d : deberia ser 90\n", *(int*)elementos[cant-1]);
+	}
+	for (size_t i = 0; i<cant; i++) {
+		printf("\n%d : printeo heapsort", *(int*)elementos[i]);
+	}
 }

@@ -151,7 +151,7 @@ void prueba_heap_constructor(){
     print_test("Desencolar devuelve el maximo", *(int*)heap_desencolar(heap) == 1);
     print_test("Ver maximo devuelve el elemento correcto", *(int*)heap_ver_max(heap) == 0);
     print_test("La cantidad de elementos es 1", heap_cantidad(heap) == 1);
-    print_test("Desencolar devuelve el maximo", *(int*)heap_desencolar(heap) == 0); 
+    print_test("Desencolar devuelve el maximo", *(int*)heap_desencolar(heap) == 0);
     print_test("El heap esta vacio", heap_esta_vacio(heap));
 
     heap_destruir(heap, NULL);
@@ -161,9 +161,40 @@ void prueba_heap_constructor(){
 
 }
 
+void pruebas_heapsort() {
+  void ** array = malloc(sizeof(void **) * 5);
+  if(!array) return;
+  int * arr_aux = malloc(sizeof(int) * 5);
+  if(!arr_aux) return;
+  arr_aux[0] = 4;
+  arr_aux[1] = 10;
+  arr_aux[2] = 1;
+  arr_aux[3] = 90;
+  arr_aux[4] = 0;
+
+  for (size_t i = 0; i < 5; i++) {
+      array[i] = (void*)&arr_aux[i];
+  }
+  heap_sort(array, 5, comparar_int);
+  bool ok = true;
+  int i;
+  for (i = 0; i < 5; i++) {
+    printf("\n%d", arr_aux[i]);
+    if (i == 0) continue;
+    if (arr_aux[i] < arr_aux[i-1]) {
+      ok = false;
+      break;
+    }
+  }
+  print_test("Ordenar con heapsort dio el resultado correcto", ok);
+  free(array);
+  free(arr_aux);
+}
+
 void pruebas_heap_alumno(void) {
   prueba_heap_vacio();
   prueba_un_elemento();
   prueba_heap_varios();
   prueba_heap_constructor();
+  pruebas_heapsort();
 }
