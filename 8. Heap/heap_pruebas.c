@@ -167,6 +167,8 @@ void prueba_volumen(){
   size_t length = 5000;
   int * arr_aux = malloc(sizeof(int) * length);
   if(!arr_aux) return;
+  void ** array = malloc(sizeof(void **) * length);
+    if(!array) return;
   int max = 0;
   bool status=true;
   heap_t * heap = heap_crear(comparar_int);
@@ -186,8 +188,10 @@ void prueba_volumen(){
           status = false;
           break;
       }
+      array[i] = (void*)&arr_aux[i];
   }
   arr_aux[length-1]=1100;
+  array[length-1] = (void*)&arr_aux[length-1];
   
   if(!heap_encolar(heap, &arr_aux[length-1])){
           status = false;
@@ -209,12 +213,30 @@ void prueba_volumen(){
   
 
   heap_destruir(heap, NULL);
-  free(arr_aux);
+  
   print_test("Se destruyo el heap", true);
   /*for (int i = 0; i < length; i++){
     printf("ARRAY: %d\n",arr_aux[i]);
   }
   printf("MAX: %d\n",max);*/
+
+  heap = heap_crear_arr(array,length,comparar_int);
+
+  print_test("Se creo el heap con arreglo", heap);
+  print_test("El heap esta vacio?", !heap_esta_vacio(heap));
+  print_test("La cantidad de elementos es 5000", heap_cantidad(heap) == length);
+  print_test("Verificar maximo", *(int*)heap_ver_max(heap) == 1200);
+  print_test("Desencolar devuelve el maximo", *(int*)heap_desencolar(heap) == 1200);
+  print_test("Verificar maximo", *(int*)heap_ver_max(heap) == 1100);
+  print_test("Desencolar devuelve el maximo", *(int*)heap_desencolar(heap) == 1100);
+  print_test("Verificar maximo", *(int*)heap_ver_max(heap) == max);
+  print_test("Desencolar devuelve el maximo", *(int*)heap_desencolar(heap) == max);
+  print_test("La cantidad de elementos es 5000", heap_cantidad(heap) == length-3);
+  
+  heap_destruir(heap, NULL);
+  free(arr_aux);
+  free(array);
+  print_test("Se destruyo el heap", true);
 }
 
 void pruebas_heapsort() {
