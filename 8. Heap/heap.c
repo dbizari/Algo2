@@ -196,7 +196,4 @@ void heap_sort(void *elementos[], size_t cant, cmp_func_t cmp) {
 			swap(&elementos[0], &elementos[cant-1-i]);
 			downheap(elementos, 0, cmp, cant-1-i);
 	}
-	for (size_t i = 0; i<cant; i++) {
-		printf("\n%d : printeo heapsort", *(int*)elementos[i]);
-	}
 }
