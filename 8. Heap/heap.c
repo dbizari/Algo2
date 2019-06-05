@@ -53,7 +53,6 @@ void downheap(void *arreglo[],size_t pos, cmp_func_t cmp, size_t cant){
 void heapify(void* arreglo[], size_t n, cmp_func_t cmp){
 	int i = (int)n/2 - 1;
 	for (; i >= 0; i--) {
-		printf("%d", i);
 		downheap(arreglo,(size_t)i, cmp, n);
 	}
 }

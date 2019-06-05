@@ -215,10 +215,6 @@ void prueba_volumen(){
   heap_destruir(heap, NULL);
 
   print_test("Se destruyo el heap", true);
-  /*for (int i = 0; i < length; i++){
-    printf("ARRAY: %d\n",arr_aux[i]);
-  }
-  printf("MAX: %d\n",max);*/
 
   heap = heap_crear_arr(array,length,comparar_int);
 
@@ -240,6 +236,7 @@ void prueba_volumen(){
 }
 
 void pruebas_heapsort() {
+  printf("\nPRUEBA HEAPSORT\n");
   void ** array = malloc(sizeof(void **) * 5);
   if(!array) return;
   int * arr_aux = malloc(sizeof(int) * 5);
@@ -263,7 +260,6 @@ void pruebas_heapsort() {
       break;
     }
   }
-
   print_test("Ordenar con heapsort dio el resultado correcto", ok);
   free(array);
   free(arr_aux);
