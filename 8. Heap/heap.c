@@ -81,6 +81,14 @@ heap_t *heap_crear(cmp_func_t cmp){
 	return heap;
 }
 
+bool heap_redimensionar(heap_t *heap, size_t cantidad){
+	if((heap->datos =(void**)realloc(heap->datos,sizeof(void*) * cantidad)) == NULL)
+	return false;
+
+	heap->capacidad = cantidad;
+	return true;
+}
+
 /*
  * Constructor alternativo del heap. Además de la función de comparación,
  * recibe un arreglo de valores con que inicializar el heap. Complejidad
@@ -133,13 +141,6 @@ bool heap_esta_vacio(const heap_t *heap){
 	return !heap->cantidad;
 }
 
-bool heap_redimensionar(heap_t *heap, size_t cantidad){
-	if((heap->datos =(void**)realloc(heap->datos,sizeof(void*) * cantidad)) == NULL)
-	return false;
-
-	heap->capacidad = cantidad;
-	return true;
-}
 
 /* Agrega un elemento al heap. El elemento no puede ser NULL.
  * Devuelve true si fue una operación exitosa, o false en caso de error.
