@@ -54,7 +54,7 @@ void heapify(void* arreglo[], size_t n, cmp_func_t cmp){
 	int i = (int)n/2 - 1;
 	for (; i >= 0; i--) {
 		printf("%d", i);
-		downheap(arreglo,(int)i, cmp, n);
+		downheap(arreglo,(size_t)i, cmp, n);
 	}
 }
 /* *****************************************************************
@@ -85,13 +85,20 @@ heap_t *heap_crear(cmp_func_t cmp){
  * Constructor alternativo del heap. Además de la función de comparación,
  * recibe un arreglo de valores con que inicializar el heap. Complejidad
  * O(n).
- *
+ *int
  * Excepto por la complejidad, es equivalente a crear un heap vacío y encolar
  * los valores de uno en uno
 */
 heap_t *heap_crear_arr(void *arreglo[], size_t n, cmp_func_t cmp) {
 	if(!cmp) return NULL;
 	heap_t* heap = heap_crear(cmp); //uso heap crear porque sino redimensionar
+
+	if(n >= heap->capacidad){
+		if(!heap_redimensionar(heap,n + 1)){
+			free(heap);
+			return NULL;
+		}
+	}
 	for (size_t i = 0; i < n; i++){ //el arreglo mucho al principio
 		heap->datos[i] = arreglo[i];
 	}

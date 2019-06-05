@@ -196,5 +196,5 @@ void pruebas_heap_alumno(void) {
   prueba_un_elemento();
   prueba_heap_varios();
   prueba_heap_constructor();
-  pruebas_heapsort();
+ // pruebas_heapsort();
 }
