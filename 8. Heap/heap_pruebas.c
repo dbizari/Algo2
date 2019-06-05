@@ -171,27 +171,27 @@ void prueba_volumen(){
   bool status=true;
   heap_t * heap = heap_crear(comparar_int);
   if(!heap) return;
-  
+
   srand((unsigned int)time(0));
   for (int i = 0; i < (length-1); i++) {
       arr_aux[i] = rand() % 1000;
       if(max < arr_aux[i])
           max = arr_aux[i];
-      
+
       if(i==length/2){
         arr_aux[i]=1200;
       }
-    
+
       if(!heap_encolar(heap, &arr_aux[i])){
           status = false;
           break;
       }
   }
   arr_aux[length-1]=1100;
-  
+
   if(!heap_encolar(heap, &arr_aux[length-1])){
           status = false;
-      }    
+      }
   print_test("Se encolaron 5000 numeros random", status);
   if(!status)
       return;
@@ -205,8 +205,8 @@ void prueba_volumen(){
   print_test("Verificar maximo", *(int*)heap_ver_max(heap) == max);
   print_test("Desencolar devuelve el maximo", *(int*)heap_desencolar(heap) == max);
   print_test("La cantidad de elementos es 5000", heap_cantidad(heap) == length-3);
-  
-  
+
+
 
   heap_destruir(heap, NULL);
   free(arr_aux);
@@ -235,13 +235,13 @@ void pruebas_heapsort() {
   bool ok = true;
   int i;
   for (i = 0; i < 5; i++) {
-    printf("\n%d", arr_aux[i]);
     if (i == 0) continue;
-    if (arr_aux[i] < arr_aux[i-1]) {
+    if (*(int*)array[i] < *(int*)array[i-1]) {
       ok = false;
       break;
     }
   }
+
   print_test("Ordenar con heapsort dio el resultado correcto", ok);
   free(array);
   free(arr_aux);
@@ -253,5 +253,5 @@ void pruebas_heap_alumno(void) {
   prueba_heap_varios();
   prueba_heap_constructor();
   prueba_volumen();
- // pruebas_heapsort();
+  pruebas_heapsort();
 }

@@ -193,12 +193,8 @@ void heap_sort(void *elementos[], size_t cant, cmp_func_t cmp) {
 	heapify(elementos, cant, cmp);
 	for (size_t i = 0; i < cant; i++) {
 			if (cant-1-i == 0) break;
-			swap(&elementos[0],&elementos[cant-1-i]);
-			printf("%d: posicion ult\n", *(int*)elementos[cant-1-i]);
-			printf("%d : antes del down\n", *(int*)elementos[0]);
+			swap(&elementos[0], &elementos[cant-1-i]);
 			downheap(elementos, 0, cmp, cant-1-i);
-			printf("%d : despues de downheap\n", *(int*)elementos[0]);
-			printf("%d : deberia ser 90\n", *(int*)elementos[cant-1]);
 	}
 	for (size_t i = 0; i<cant; i++) {
 		printf("\n%d : printeo heapsort", *(int*)elementos[i]);
