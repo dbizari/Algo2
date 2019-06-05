@@ -88,10 +88,10 @@ heap_t *heap_crear(cmp_func_t cmp){
  * los valores de uno en uno
 */
 heap_t *heap_crear_arr(void *arreglo[], size_t n, cmp_func_t cmp) {
-	heap_t* heap = heap_crear(cmp);
+	if(!cmp) return NULL;
+	heap_t *heap = malloc(sizeof(heap_t));
 	if (!heap) return NULL;
 
-	free(heap->datos);
 	heap->datos = malloc(sizeof(void *) * (n + 1));
 	if(!heap->datos){
 		free(heap);
