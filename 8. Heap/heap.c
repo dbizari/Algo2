@@ -50,9 +50,9 @@ void downheap(void *arreglo[],size_t pos, cmp_func_t cmp, size_t cant){
 	}
 }
 
-void heapify(void* arreglo[], size_t n, cmp_func_t cmp) {
-	for (i = n/2 - 1; i >= 0 ; i--) {
-		downheap(arreglo, i, cmp, n);
+void heapify(heap_t* heap){
+	for (int i = (int)(heap->cantidad/2 - 1); i >= 0 ; i--) {
+		downheap(heap->datos, (size_t)i, heap->cmp, heap->cantidad);
 	}
 }
 /* *****************************************************************
@@ -90,14 +90,22 @@ heap_t *heap_crear(cmp_func_t cmp){
 heap_t *heap_crear_arr(void *arreglo[], size_t n, cmp_func_t cmp) {
 	heap_t* heap = heap_crear(cmp);
 	if (!heap) return NULL;
-	for (size_t i = 0; i<n; i++) {
-		heap->datos[i] = arreglo[i];
-		heap->cantidad++;
-	}
-	heapify(heap->datos, n, cmp);
-	return heap;
 
-}//HEAPIFY!!!
+	free(heap->datos);
+	heap->datos = malloc(sizeof(void *) * (n + 1));
+	if(!heap->datos){
+		free(heap);
+		return NULL;
+	}
+	for (size_t i = 0; i < n; i++){
+		heap->datos[i] = arreglo[i];
+	}
+	heap->cantidad = n;
+	heap->capacidad = n + 1;
+	heap->cmp = cmp;
+	heapify(heap);
+	return heap;
+}
 
 /* Elimina el heap, llamando a la función dada para cada elemento del mismo.
  * El puntero a la función puede ser NULL, en cuyo caso no se llamará.
@@ -168,6 +176,8 @@ void *heap_desencolar(heap_t *heap){
 	void * dato = heap->datos[0];
 
 	heap->cantidad--;
+	if(heap->cantidad == 0)
+		return dato;
 	swap(&heap->datos[0],&heap->datos[heap->cantidad]);
 	downheap(heap->datos, 0, heap->cmp, heap->cantidad);
 	if(heap->cantidad == (heap->capacidad / 4)){
