@@ -11,26 +11,16 @@
  *                    DEFINICION DE STRUCTS
  * *****************************************************************/
 
-struct hash {
-	lista_t** tabla;
+struct count_min_sketch {
+	size_t* tabla1;
+	size_t* tabla2;
+	size_t* tabla3;
 	size_t cantidad;
 	size_t tam;
-	hash_destruir_dato_t destruir_dato;
-};
-
-typedef struct nodo_hash {
-	void* dato;
-	char* clave;
-}nodo_hash_t;
-
-struct hash_iter{
-    const hash_t* hash;
-    size_t pos;
-    lista_iter_t* lista_iter;
 };
 
 //Funcion de Hash JBD2
-size_t f_hash(const char *str)
+size_t f_hash1(const char *str)
 {
 	size_t hash = 5381;
     int c;
@@ -40,16 +30,37 @@ size_t f_hash(const char *str)
 
     return hash;
 }
+// Funcion de Hash SDBM
+size_t f_hash2(const char *str){
+	unsigned long hash = 0;
+    int c;
+
+    while ((c = *str++))
+        hash = (unsigned long)c + (hash << 6) + (hash << 16) - hash;
+
+    return hash;
+}
+// Función de Hash sacada de http://www.cs.yale.edu/homes/aspnes/pinewiki/C(2f)HashTables.html?highlight=%28CategoryAlgorithmNotes%29
+size_t f_hash(const char *str)
+{
+	unsigned long hash;
+    unsigned const char *us;
+
+	/* cast s to unsigned const char * */
+	/* this ensures that elements of s will be treated as having values >= 0 */
+	us = (unsigned const char *) str;
+
+	hash = 0;
+	while(*us != '\0') {
+		hash = hash * 37 + *us;
+		us++;
+	}
+
+    return hash;
+}
 /* *****************************************************************
  *                    FUNCIONES AUXILIARES
  * *****************************************************************/
-char * strdup(const char * str){ //El usuario se encarga de liberar la memoria
-	char * str2 = malloc(sizeof(char) * (strlen(str) + 1));
-	if(!str2) return 0;
-
-	strcpy(str2,str);
-	return str2;
-}
 
 lista_t** crear_tabla(size_t tam){
 	lista_t** aux;
