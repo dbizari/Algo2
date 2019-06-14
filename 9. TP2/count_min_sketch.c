@@ -107,12 +107,16 @@ size_t count_min_sketch_obtener_min(const count_min_sketch_t *cms, const char *c
 	size_t posiciones[CANT_TABLAS];
 	size_t min;
 
+	printf("%s:\n",clave );
 	get_positions(cms,clave,posiciones);
 	min = cms->tablas[0][posiciones[0]];
+	printf("Tabla1:%lu\t", cms->tablas[0][posiciones[0]]);
 	for(size_t i = 1; i < CANT_TABLAS; i++){
+		printf("Tabla%lu:%lu\t",i+1,cms->tablas[i][posiciones[i]]);
 		if(cms->tablas[i][posiciones[i]] < min)
 			min = cms->tablas[i][posiciones[i]];
 	}
+	putchar('\n');
 	return min;
 }
 
@@ -124,7 +128,7 @@ void count_min_sketch_destruir(count_min_sketch_t *cms){
 	free(cms);
 }
 int main(int argc, char const *argv[]) {
-	count_min_sketch_t * cms= count_min_sketch_crear(3);
+	count_min_sketch_t * cms= count_min_sketch_crear(10);
 
 	count_min_sketch_guardar(cms,"gato");
 	count_min_sketch_guardar(cms,"perro");
@@ -132,9 +136,14 @@ int main(int argc, char const *argv[]) {
 	count_min_sketch_guardar(cms,"gbto");
 	count_min_sketch_guardar(cms,"cor");
 	count_min_sketch_guardar(cms,"csr");
+	count_min_sketch_guardar(cms,"zzz");
+	count_min_sketch_guardar(cms,"csasdfr");
+	count_min_sketch_guardar(cms,"tumama");
+	count_min_sketch_guardar(cms,"kiii");
+	count_min_sketch_guardar(cms,"crre");
 
-	
-	printf("gato: %lu\tperro: %lu\n",count_min_sketch_obtener_min(cms,"gato"),count_min_sketch_obtener_min(cms,"perro") );
+
+	printf("gato: %lu\tperro: %lu\n",count_min_sketch_obtener_min(cms,"asfad"),count_min_sketch_obtener_min(cms,"perro") );
 	count_min_sketch_destruir(cms);
 	return 0;
 }
