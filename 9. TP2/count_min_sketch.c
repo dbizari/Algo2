@@ -1,23 +1,20 @@
-#include "hash.h"
-#include "lista.h"
+#include "count_min_sketch.h"
 #include <stdlib.h>
 #include <string.h>
 #include <stddef.h>
 #include <stdio.h>
-#define TAM_INICIAL 109
-#define NUM_REDIMENSION 2
-#define NUM_VERIFICACION 4
+#define CANT_TABLAS 3
 /* *****************************************************************
- *                    DEFINICION DE STRUCTS
+ *                          DEFINICIONES
  * *****************************************************************/
 
 struct count_min_sketch {
-	size_t* tabla1;
-	size_t* tabla2;
-	size_t* tabla3;
-	size_t cantidad;
+	size_t** tablas;
 	size_t tam;
+	size_t cantidad_tablas;
 };
+
+typedef size_t (*fh_t)(const char *str);
 
 //Funcion de Hash JBD2
 size_t f_hash1(const char *str)
@@ -41,7 +38,7 @@ size_t f_hash2(const char *str){
     return hash;
 }
 // Función de Hash sacada de http://www.cs.yale.edu/homes/aspnes/pinewiki/C(2f)HashTables.html?highlight=%28CategoryAlgorithmNotes%29
-size_t f_hash(const char *str)
+size_t f_hash3(const char *str)
 {
 	unsigned long hash;
     unsigned const char *us;
@@ -58,309 +55,86 @@ size_t f_hash(const char *str)
 
     return hash;
 }
+
+fh_t functions[3]={f_hash1,f_hash2,f_hash3};
 /* *****************************************************************
  *                    FUNCIONES AUXILIARES
  * *****************************************************************/
+//Devuelve array con posiciones
+void get_positions(const count_min_sketch_t * cms,const char *clave,size_t * array){
+	for (size_t i = 0; i < CANT_TABLAS; i++) {
+		array[i] = functions[i](clave) % cms->tam;
+	}
+}
+/* *****************************************************************
+*                    PRIMITIVAS DE COUNT_MIN_SKETCH
+* *****************************************************************/
 
-lista_t** crear_tabla(size_t tam){
-	lista_t** aux;
+count_min_sketch_t * count_min_sketch_crear(size_t tam){
+	count_min_sketch_t* cms = malloc(sizeof(count_min_sketch_t));
+	if(!cms) return NULL;
 
-	aux = malloc(tam * sizeof(lista_t *));
-	if(!aux) return NULL;
+	cms->tablas = malloc(sizeof(size_t*) * CANT_TABLAS);
+	if(!cms->tablas){
+		free(cms);
+		return NULL;
+	}
 
-	size_t i;
-	for (i = 0; i < tam; i++) {
-		aux[i] = lista_crear();
-		if (!aux[i]) {
-			for(size_t j = 0; j<i; j++) {
-				lista_destruir(aux[j], NULL);
-			}
-			free(aux);
+	cms->cantidad_tablas = 0;
+
+	for (size_t i = 0; i < CANT_TABLAS; i++) {
+		cms->tablas[i] = calloc(tam,sizeof(size_t));
+		if(!cms->tablas[i]){
+			count_min_sketch_destruir(cms);
 			return NULL;
 		}
+		cms->cantidad_tablas++;
 	}
-
-	return aux;
+	cms->tam = tam;
+	return cms;
 }
 
-void destruir_tabla(hash_t* hash) {
-	for(size_t i = 0; i < hash->tam; i++){
-		lista_destruir(hash->tabla[i],NULL);
+void count_min_sketch_guardar(count_min_sketch_t *cms, const char *clave){
+	size_t posiciones[CANT_TABLAS];
+
+	get_positions(cms,clave,posiciones);
+	for(size_t i = 0; i < CANT_TABLAS; i++){
+		cms->tablas[i][posiciones[i]]++;
 	}
-	free(hash->tabla);
 }
 
-/* *****************************************************************
- *                    PRIMITIVAS DE NODO HASH
- * *****************************************************************/
+size_t count_min_sketch_obtener_min(const count_min_sketch_t *cms, const char *clave){
+	size_t posiciones[CANT_TABLAS];
+	size_t min;
 
-nodo_hash_t* nodo_hash_crear(const char *clave, void *dato){
-	nodo_hash_t* aux = malloc(sizeof(nodo_hash_t));
-    if(!aux) return NULL;
-
-	if((aux->clave = strdup(clave)) == NULL){
-		free(aux);
-		return NULL;
+	get_positions(cms,clave,posiciones);
+	min = cms->tablas[0][posiciones[0]];
+	for(size_t i = 1; i < CANT_TABLAS; i++){
+		if(cms->tablas[i][posiciones[i]] < min)
+			min = cms->tablas[i][posiciones[i]];
 	}
-	aux->dato = dato;
-	return aux;
+	return min;
 }
 
-void nodo_hash_destruir(nodo_hash_t* nodo_hash){
-	free(nodo_hash->clave);
-	free(nodo_hash);
-}
-
-lista_iter_t* buscar_nodo(const hash_t* hash, const char* clave) {
-	size_t pos = f_hash(clave) % hash->tam;
-	lista_iter_t* iter = lista_iter_crear(hash->tabla[pos]);
-	if(!iter) return NULL;
-
-	while (!lista_iter_al_final(iter)) {
-		nodo_hash_t* aux = lista_iter_ver_actual(iter);
-		if (!strcmp(aux->clave, clave)) {
-			return iter;
-		}
-		lista_iter_avanzar(iter);
+void count_min_sketch_destruir(count_min_sketch_t *cms){
+	for (size_t i = 0; i < cms->cantidad_tablas; i++) {
+		free(cms->tablas[i]);
 	}
-	return iter;
+	free(cms->tablas);
+	free(cms);
 }
+int main(int argc, char const *argv[]) {
+	count_min_sketch_t * cms= count_min_sketch_crear(3);
 
-/* *****************************************************************
-*                    PRIMITIVAS DE HASH
-* *****************************************************************/
-hash_t * hash_crear(hash_destruir_dato_t destruir_dato){
-	hash_t* hash = malloc(sizeof(hash_t));
-	if(!hash) return NULL;
+	count_min_sketch_guardar(cms,"gato");
+	count_min_sketch_guardar(cms,"perro");
+	count_min_sketch_guardar(cms,"parro");
+	count_min_sketch_guardar(cms,"gbto");
+	count_min_sketch_guardar(cms,"cor");
+	count_min_sketch_guardar(cms,"csr");
 
-	hash->tabla = crear_tabla(TAM_INICIAL);
-	if(!hash->tabla){
-		free(hash);
-		return NULL;
-	}
-	hash->tam = TAM_INICIAL;
-	hash->destruir_dato = destruir_dato;
-	hash->cantidad = 0;
-	return hash;
+	
+	printf("gato: %lu\tperro: %lu\n",count_min_sketch_obtener_min(cms,"gato"),count_min_sketch_obtener_min(cms,"perro") );
+	count_min_sketch_destruir(cms);
+	return 0;
 }
-
-bool redimensionar_hash(hash_t * hash,size_t new_size){
-	bool status = true;
-	lista_iter_t* iter;
-	nodo_hash_t*  aux;
-	hash_t* new = malloc(sizeof(hash_t));
-	if(!new) return false;
-
-	new->tabla = crear_tabla(new_size);
-	if(!new->tabla){
-		free(new);
-		return false;
-	}
-	new->tam = new_size;
-	new->cantidad = 0;
-	for(size_t i = 0; i < hash->tam; i++){
-		iter = lista_iter_crear(hash->tabla[i]);
-		while(!lista_iter_al_final(iter)){
-			aux = lista_iter_ver_actual(iter);
-			size_t pos = f_hash(aux->clave) % new->tam;
-			if (!lista_insertar_ultimo(new->tabla[pos], aux)) {
-				status=false;
-				break;
-			}
-			new->cantidad++;
-			lista_iter_avanzar(iter);
-		}
-		lista_iter_destruir(iter);
-		if(!status) {
-			destruir_tabla(new);
-			break;
-		}
-	}
-
-	if(status){
-		destruir_tabla(hash);
-		hash->tabla = new->tabla;
-		hash->tam = new->tam;
-		hash->cantidad = new->cantidad;
-	}
-	free(new);
-	return status;
-}
-bool hash_guardar(hash_t *hash, const char *clave, void *dato) {
-	lista_iter_t* iter;
-	nodo_hash_t *aux_nodo;
-
-	iter = buscar_nodo(hash, clave);
-	if (!lista_iter_al_final(iter)) {
-		aux_nodo = lista_iter_ver_actual(iter);
-		void* dato_viejo = aux_nodo->dato;
-		aux_nodo->dato = dato;
-		if (hash->destruir_dato != NULL) (hash->destruir_dato)(dato_viejo);
-	} else {
-		aux_nodo = nodo_hash_crear(clave,dato);
-		if(!aux_nodo){
-			lista_iter_destruir(iter);
-			return false;
-		}
-		lista_iter_insertar(iter,aux_nodo);
-		hash->cantidad++;
-		if(hash->cantidad > (hash->tam * NUM_REDIMENSION)) {
-			if(!redimensionar_hash(hash,NUM_REDIMENSION*hash->tam)){
-				lista_iter_destruir(iter);
-				return false;
-			}
-		}
-	}
-	lista_iter_destruir(iter);
-	return true;
-}
-
-void* hash_borrar(hash_t *hash, const char *clave) {
-	void*         dato;
-	nodo_hash_t*  aux_nodo;
-	lista_iter_t* iter;
-
-	iter = buscar_nodo(hash, clave);
-	if (!lista_iter_al_final(iter)) {
-		aux_nodo = lista_iter_ver_actual(iter);
-		dato = aux_nodo->dato;
-		nodo_hash_destruir(aux_nodo);
-		hash->cantidad--;
-		lista_iter_borrar(iter);
-		lista_iter_destruir(iter);
-		if(hash->cantidad < (hash->tam / NUM_VERIFICACION) && hash->tam > TAM_INICIAL*NUM_VERIFICACION) {
-			if(!redimensionar_hash(hash,(hash->tam)/NUM_REDIMENSION)) {
-				return NULL;
-			}
-		}
-		return dato;
-	}
-	lista_iter_destruir(iter);
-	return NULL;
-}
-
-void * hash_obtener(const hash_t *hash, const char *clave){
-	nodo_hash_t * aux_nodo;
-	lista_iter_t * iter;
-
-	iter = buscar_nodo(hash, clave);
-	aux_nodo = lista_iter_ver_actual(iter);
-	lista_iter_destruir(iter);
-	return aux_nodo == NULL ? NULL : aux_nodo->dato;
-}
-
-bool hash_pertenece(const hash_t *hash, const char *clave){
-	nodo_hash_t * aux_nodo;
-	lista_iter_t * iter;
-
-	iter = buscar_nodo(hash, clave);
-	aux_nodo = lista_iter_ver_actual(iter);
-	lista_iter_destruir(iter);
-	return aux_nodo == NULL ? false : true;
-}
-
-size_t hash_cantidad(const hash_t *hash){
-	return hash->cantidad;
-}
-
-void hash_destruir(hash_t *hash){
-	lista_iter_t* iter;
-	nodo_hash_t* aux;
-
-	for(size_t i = 0; i < hash->tam; i++){
-		iter = lista_iter_crear(hash->tabla[i]);
-		while(!lista_iter_al_final(iter)){
-			aux = lista_iter_ver_actual(iter);
-			if((hash->destruir_dato) != NULL) {
-				(hash->destruir_dato)(aux->dato);
-			}
-
-			nodo_hash_destruir(aux);
-			lista_iter_borrar(iter);
-		}
-		lista_iter_destruir(iter);
-		lista_destruir(hash->tabla[i],NULL);
-	}
-	free(hash->tabla);
-	free(hash);
-	return;
-}
-/* *****************************************************************
- *                 PRIMITIVAS DE ITERADOR HASH
- * *****************************************************************/
-
-  //funcion auxiliar
-  lista_iter_t* _buscar_no_vacio(hash_iter_t* iter, size_t pos) {
-  	lista_iter_t* aux = NULL;
-  	for (; pos < iter->hash->tam; pos++) {
-  		if (!lista_esta_vacia(iter->hash->tabla[pos]) || pos == (iter->hash->tam -1)) {
-      		iter->pos = pos;
-      		aux = lista_iter_crear(iter->hash->tabla[pos]);
-      		break;
-  		}
-  	}
-  	if (!aux) return NULL;
-  	return aux;
-  }
-
-   // Crea iterador
-   hash_iter_t * hash_iter_crear(const hash_t *hash){
-  	hash_iter_t* iter = malloc(sizeof(hash_iter_t));
-
-      if(iter == NULL) return NULL;
-      iter->hash = hash;
-
-     	if (hash->cantidad == 0) {
-     		iter->pos = hash->tam -1;
-     		iter->lista_iter = lista_iter_crear(hash->tabla[hash->tam-1]);
-
-     	} else {
-     		iter->pos = 0;
-     		size_t pos = 0;
-     		iter->lista_iter = _buscar_no_vacio(iter, pos);
-
-     	}
-
-     	if (iter->lista_iter == NULL) {
-     		free(iter);
-     		return NULL;
-     	}
-
-      return iter;
-   }
-
-   // Avanza iterador
-   bool hash_iter_avanzar(hash_iter_t *iter) {
-   	if(hash_iter_al_final(iter)) return false;
-
-   	lista_iter_avanzar(iter->lista_iter);
-
-   	if (lista_iter_al_final(iter->lista_iter) && !hash_iter_al_final(iter)) {
-   		lista_iter_destruir(iter->lista_iter);
-   		size_t pos = iter->pos +1;
-   		iter->lista_iter = _buscar_no_vacio(iter, pos);
-   		if (iter->lista_iter == NULL) return false;
-   	}
-
-   	return true;
-   }
-
-   // Devuelve clave actual, esa clave no se puede modificar ni liberar.
-   const char *hash_iter_ver_actual(const hash_iter_t *iter) {
-   	if (hash_iter_al_final(iter)) return NULL;
-
-   	nodo_hash_t* aux = lista_iter_ver_actual(iter->lista_iter);
-   	return aux->clave;
-   }
-
-   // Comprueba si terminó la iteración
-   bool hash_iter_al_final(const hash_iter_t *iter) {
-   	if(iter->pos == (iter->hash->tam - 1) && lista_iter_al_final(iter->lista_iter)) return true;
-   	return false;
-   }
-
-   // Destruye iterador
-   void hash_iter_destruir(hash_iter_t* iter) {
-   	lista_iter_destruir(iter->lista_iter);
-   	free(iter);
-   }

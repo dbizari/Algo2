@@ -2,8 +2,6 @@
 #include <string.h>
 #include <stdlib.h>
 #include <stdio.h>
-#include "vector.h"
-#include "pila.h"
 
 #define MAX_ARGS  2
 #define FILE_POS  1
