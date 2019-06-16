@@ -81,8 +81,9 @@ heap_t *heap_crear(cmp_func_t cmp){
 }
 
 bool heap_redimensionar(heap_t *heap, size_t cantidad){
-	if((heap->datos =(void**)realloc(heap->datos,sizeof(void*) * cantidad)) == NULL)
-	return false;
+	void** datos_nuevos = realloc(heap->datos,sizeof(void*) * cantidad);
+	if (datos_nuevos == NULL)	return false;
+	heap->datos = datos_nuevos;
 
 	heap->capacidad = cantidad;
 	return true;
