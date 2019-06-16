@@ -127,6 +127,7 @@ void count_min_sketch_destruir(count_min_sketch_t *cms){
 	free(cms->tablas);
 	free(cms);
 }
+/*
 int main(int argc, char const *argv[]) {
 	count_min_sketch_t * cms= count_min_sketch_crear(10);
 
@@ -146,4 +147,4 @@ int main(int argc, char const *argv[]) {
 	printf("gato: %lu\tperro: %lu\n",count_min_sketch_obtener_min(cms,"asfad"),count_min_sketch_obtener_min(cms,"perro") );
 	count_min_sketch_destruir(cms);
 	return 0;
-}
+}*/
