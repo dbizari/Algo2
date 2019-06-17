@@ -86,8 +86,6 @@ int procesar_linea(count_min_sketch_t * csm, hash_t * hash_claves){
 					if(!hash_guardar(hash_claves,str_aux,NULL)){
 						free(linea);
 						free(str_aux);
-						count_min_sketch_destruir(csm);
-						hash_destruir(hash_claves);
 						return EXIT_FAILURE;
 					}
 				}
