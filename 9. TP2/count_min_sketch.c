@@ -107,12 +107,12 @@ size_t count_min_sketch_obtener_min(const count_min_sketch_t *cms, const char *c
 	size_t posiciones[CANT_TABLAS];
 	size_t min;
 
-	printf("%s:\n",clave );
+	//printf("%s:\n",clave );
 	get_positions(cms,clave,posiciones);
 	min = cms->tablas[0][posiciones[0]];
-	printf("Tabla1:%lu\t", cms->tablas[0][posiciones[0]]);
+	//printf("Tabla1:%lu\t", cms->tablas[0][posiciones[0]]);
 	for(size_t i = 1; i < CANT_TABLAS; i++){
-		printf("Tabla%lu:%lu\t",i+1,cms->tablas[i][posiciones[i]]);
+		//printf("Tabla%lu:%lu\t",i+1,cms->tablas[i][posiciones[i]]);
 		if(cms->tablas[i][posiciones[i]] < min)
 			min = cms->tablas[i][posiciones[i]];
 	}
