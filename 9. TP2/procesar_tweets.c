@@ -155,10 +155,10 @@ int imprimir_tt(size_t k,hash_t * hash_claves,count_min_sketch_t * csm){
 
 int procesar_tweets(size_t n,size_t k){
 	size_t cont = 0;
+	count_min_sketch_t * csm = count_min_sketch_crear(n * 100);
+	if(!csm) return EXIT_FAILURE;
 
 	while(!feof(stdin)){
-		count_min_sketch_t * csm = count_min_sketch_crear(n * 100);
-		if(!csm) return EXIT_FAILURE;
 		hash_t * hash_claves = hash_crear(NULL);
 		if(!hash_claves){
 			count_min_sketch_destruir(csm);
@@ -179,8 +179,8 @@ int procesar_tweets(size_t n,size_t k){
 			return EXIT_FAILURE;
 		}
 		hash_destruir(hash_claves);
-		count_min_sketch_destruir(csm);
 	}
+	count_min_sketch_destruir(csm);
 	return EXIT_SUCCESS;
 }
 int main(int argc, char const *argv[]) {
