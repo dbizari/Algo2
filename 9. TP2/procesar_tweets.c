@@ -6,6 +6,9 @@
 #include <unistd.h>
 #include "strutil.h"
 #include "hash.h"
+#include "heap.h"
+#include "tag.h"
+#include "pila.h"
 #include "count_min_sketch.h"
 
 #define ARGS  	  3
@@ -13,6 +16,32 @@
 #define K_POS     2
 #define DELIM    ','
 
+/* *****************************************************************
+ *                    FUNCIONES AUXILIARES
+ * *****************************************************************/
+int cmp_tags(const void * dato1,const void * dato2){ //Diseñado para que se comporte como un heap
+    tag_t * tag1 = (tag_t*)dato1;
+    tag_t * tag2 = (tag_t*)dato2;
+
+    if(tag_ver_freq(tag1) == tag_ver_freq(tag2)){
+        if(strcmp(tag_ver_clave(tag1),tag_ver_clave(tag2)) > 0){ //No estoy seguro de que el orden este bien
+            return 1;
+        }else{
+            return -1;
+        }
+    }else if(tag_ver_freq(tag1) > tag_ver_freq(tag2)){
+        return -1;
+    }else{
+        return 1;
+    }
+}
+void _tag_destruir(void * data){
+	tag_destruir((tag_t*)data);
+}
+
+/* *****************************************************************
+ *
+ * *****************************************************************/
 int validate_arguments(int argc, char const *argv[],size_t * n,size_t * k){
 	char * tmp_conversion;
 
@@ -51,7 +80,6 @@ int procesar_linea(count_min_sketch_t * csm, hash_t * hash_claves){
 
 		if(linea[j+1] == DELIM || linea[j+1] == '\n'){
 			if(str_aux != NULL){
-				//printf("Tag:%s\tLargo:%d\n\n",(str_aux=substr(str_aux,(size_t)tag_len)),tag_len);
 				str_aux = substr(str_aux,(size_t)tag_len);
 				count_min_sketch_guardar(csm,str_aux);
 				if(!hash_pertenece(hash_claves,str_aux)){
@@ -69,31 +97,59 @@ int procesar_linea(count_min_sketch_t * csm, hash_t * hash_claves){
 			tag_len = -1;
 		}
 	}
+	free(linea);
 	return EXIT_SUCCESS;
 }
 
 int imprimir_tt(size_t k,hash_t * hash_claves,count_min_sketch_t * csm){
 	hash_iter_t * iter = hash_iter_crear(hash_claves);
-	if(!iter){
-		hash_destruir(hash_claves);
-		count_min_sketch_destruir(csm);
-		return EXIT_FAILURE;
-	}
-	/*heap_t * heap_tt = heap_crear(); //Me falta la funcion de cmp
+	if(!iter) return EXIT_FAILURE;
+	heap_t * heap_tt = heap_crear(cmp_tags);
 	if(!heap_tt){
 		hash_iter_destruir(iter);
 		return EXIT_FAILURE;
-	}*/
-
-	while (!hash_iter_al_final(iter)) {
-		//Tengo que encolar en el heap
-		printf("Clave:%s\tFreq:%lu\n",hash_iter_ver_actual(iter), count_min_sketch_obtener_min(csm,hash_iter_ver_actual(iter)));
-		hash_iter_avanzar(iter);
 	}
-	//Tengo que printear los k primeros del heap
+	pila_t * pila = pila_crear();
+	if(!pila){
+		hash_iter_destruir(iter);
+		heap_destruir(heap_tt,NULL);
+		return EXIT_FAILURE;
+	}
+	tag_t * tag;
 
+	for (size_t i = 0; !hash_iter_al_final(iter); i++,hash_iter_avanzar(iter)) {
+		tag = tag_crear(hash_iter_ver_actual(iter),count_min_sketch_obtener_min(csm,hash_iter_ver_actual(iter)));
+		if(!tag){
+			hash_iter_destruir(iter);
+			heap_destruir(heap_tt,NULL);
+			pila_destruir(pila);
+			return EXIT_FAILURE;
+		}
+
+		if(i < k){
+			heap_encolar(heap_tt,(void*)tag);
+		}
+		else{
+			if(cmp_tags(heap_ver_max(heap_tt),(void*)tag) > 0 ){
+				tag_destruir((tag_t*)heap_desencolar(heap_tt));
+				heap_encolar(heap_tt,(void*)tag);
+			}else{
+				tag_destruir(tag);
+			}
+		}
+	}
+	while (!heap_esta_vacio(heap_tt)) {
+		pila_apilar(pila,heap_desencolar(heap_tt));
+	}
+	while (!pila_esta_vacia(pila)) {
+		tag = (tag_t*)pila_desapilar(pila);
+		printf("%lu %s\n",tag_ver_freq(tag),tag_ver_clave(tag));
+		tag_destruir(tag);
+	}
+
+	pila_destruir(pila);
 	hash_iter_destruir(iter);
-	//	heap_destruir(heap_tt);
+	heap_destruir(heap_tt,_tag_destruir);
 	return EXIT_SUCCESS;
 }
 
@@ -110,7 +166,6 @@ int procesar_tweets(size_t n,size_t k){
 		}
 
 		printf("--- %lu\n",++cont );
-
 		for(size_t i = 0; i < n; i++){
 			if(procesar_linea(csm,hash_claves) != EXIT_SUCCESS){
 				hash_destruir(hash_claves);
@@ -139,6 +194,5 @@ int main(int argc, char const *argv[]) {
 		fprintf(stderr,"Error: al procesar tweets\n");
 		return EXIT_FAILURE;
 	}
-	printf("Finishhh\n" );
 	return EXIT_SUCCESS;
 }

@@ -116,7 +116,7 @@ size_t count_min_sketch_obtener_min(const count_min_sketch_t *cms, const char *c
 		if(cms->tablas[i][posiciones[i]] < min)
 			min = cms->tablas[i][posiciones[i]];
 	}
-	putchar('\n');
+	//putchar('\n');
 	return min;
 }
 
@@ -144,7 +144,7 @@ int main(int argc, char const *argv[]) {
 	count_min_sketch_guardar(cms,"crre");
 
 
-	printf("gato: %lu\tperro: %lu\n",count_min_sketch_obtener_min(cms,"asfad"),count_min_sketch_obtener_min(cms,"perro") );
+	printf("gato: %lu\tperro: %lu\n",count_min_sketch_obtener_min(cms,"gato"),count_min_sketch_obtener_min(cms,"perro") );
 	count_min_sketch_destruir(cms);
 	return 0;
 }*/
