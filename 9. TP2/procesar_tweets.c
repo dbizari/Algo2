@@ -36,13 +36,71 @@ int validate_arguments(int argc, char const *argv[],size_t * n,size_t * k){
 	return EXIT_SUCCESS;
 }
 
-int procesar_tweets(size_t n,size_t k){
-	char * linea = NULL;
+int procesar_linea(count_min_sketch_t * csm, hash_t * hash_claves){
+	char * linea = NULL,* str_aux = NULL;
 	size_t tam = 0;
 	ssize_t largo = 0;
-	char * str_aux;
+	int tag_len = 0;
 
-	//while(!feof(stdin)){
+	if((largo = getline(&linea, &tam, stdin)) == -1)
+		return EXIT_SUCCESS; // Llego al fin del archivo
+
+	for (size_t j = 0; linea[j] != '\0'; j++,tag_len++) {
+		if(j == 0)
+			str_aux = NULL;
+
+		if(linea[j+1] == DELIM || linea[j+1] == '\n'){
+			if(str_aux != NULL){
+				//printf("Tag:%s\tLargo:%d\n\n",(str_aux=substr(str_aux,(size_t)tag_len)),tag_len);
+				str_aux = substr(str_aux,(size_t)tag_len);
+				count_min_sketch_guardar(csm,str_aux);
+				if(!hash_pertenece(hash_claves,str_aux)){
+					if(!hash_guardar(hash_claves,str_aux,NULL)){
+						free(linea);
+						free(str_aux);
+						count_min_sketch_destruir(csm);
+						hash_destruir(hash_claves);
+						return EXIT_FAILURE;
+					}
+				}
+				free(str_aux); //Libero memoria que reservo substr
+			}
+			str_aux = &linea[j+2];
+			tag_len = -1;
+		}
+	}
+	return EXIT_SUCCESS;
+}
+
+int imprimir_tt(size_t k,hash_t * hash_claves,count_min_sketch_t * csm){
+	hash_iter_t * iter = hash_iter_crear(hash_claves);
+	if(!iter){
+		hash_destruir(hash_claves);
+		count_min_sketch_destruir(csm);
+		return EXIT_FAILURE;
+	}
+	/*heap_t * heap_tt = heap_crear(); //Me falta la funcion de cmp
+	if(!heap_tt){
+		hash_iter_destruir(iter);
+		return EXIT_FAILURE;
+	}*/
+
+	while (!hash_iter_al_final(iter)) {
+		//Tengo que encolar en el heap
+		printf("Clave:%s\tFreq:%lu\n",hash_iter_ver_actual(iter), count_min_sketch_obtener_min(csm,hash_iter_ver_actual(iter)));
+		hash_iter_avanzar(iter);
+	}
+	//Tengo que printear los k primeros del heap
+
+	hash_iter_destruir(iter);
+	//	heap_destruir(heap_tt);
+	return EXIT_SUCCESS;
+}
+
+int procesar_tweets(size_t n,size_t k){
+	size_t cont = 0;
+
+	while(!feof(stdin)){
 		count_min_sketch_t * csm = count_min_sketch_crear(n * 100);
 		if(!csm) return EXIT_FAILURE;
 		hash_t * hash_claves = hash_crear(NULL);
@@ -51,45 +109,23 @@ int procesar_tweets(size_t n,size_t k){
 			return EXIT_FAILURE;
 		}
 
+		printf("--- %lu\n",++cont );
+
 		for(size_t i = 0; i < n; i++){
-			if((largo = getline(&linea, &tam, stdin)) == -1)
-				break;
-
-			int tag_len = 0;
-			for (size_t j = 0; linea[j] != '\0'; j++,tag_len++) {
-				if(j == 0)
-					str_aux = NULL;
-
-				if(linea[j+1] == DELIM || linea[j+1] == '\n'){
-					if(str_aux != NULL){
-						/*printf("Tag:%s\tLargo:%d\n\n",(str_aux=substr(str_aux,(size_t)tag_len)),tag_len);*/
-						str_aux=substr(str_aux,(size_t)tag_len);
-						count_min_sketch_guardar(csm,str_aux);
-						if(!hash_pertenece(hash_claves,str_aux)){
-							if(!hash_guardar(hash_claves,str_aux,NULL)){
-								count_min_sketch_destruir(csm);
-								free(linea);
-								hash_destruir(hash_claves);
-								return EXIT_FAILURE;
-							}
-						}
-						//free(str_aux);
-						//printf("LLEGA\n" );
-					}
-					str_aux = &linea[j+2];
-					tag_len = -1;
-				}
+			if(procesar_linea(csm,hash_claves) != EXIT_SUCCESS){
+				hash_destruir(hash_claves);
+				count_min_sketch_destruir(csm);
+				return EXIT_FAILURE;
 			}
 		}
-		hash_iter_t * iter=hash_iter_crear(hash_claves);
-		while (!hash_iter_al_final(iter)) {
-			printf("Clave:%s\tFreq:%lu\n",hash_iter_ver_actual(iter), count_min_sketch_obtener_min(csm,hash_iter_ver_actual(iter)));
-			hash_iter_avanzar(iter);
+		if(imprimir_tt(k,hash_claves,csm) != EXIT_SUCCESS){
+			hash_destruir(hash_claves);
+			count_min_sketch_destruir(csm);
+			return EXIT_FAILURE;
 		}
-		hash_iter_destruir(iter);
+		hash_destruir(hash_claves);
 		count_min_sketch_destruir(csm);
-	//}
-	free(linea);
+	}
 	return EXIT_SUCCESS;
 }
 int main(int argc, char const *argv[]) {
