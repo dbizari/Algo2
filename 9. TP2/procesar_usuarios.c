@@ -32,33 +32,33 @@ char** ordenar_por_cantidad(hash_t* usuarios, size_t max) {
 			return NULL;
 		}
 	}
-	hash_iter_t* iter = hash_iter_crear(usuarios);
-	while(!hash_iter_al_final(iter)) {
-		const char* usuario = hash_iter_ver_actual(iter);
+	hash_iter_t* iter_usuarios = hash_iter_crear(usuarios);
+	while(!hash_iter_al_final(iter_usuarios)) {
+		const char* usuario = hash_iter_ver_actual(iter_usuarios);
 		hash_t* dato = hash_obtener(usuarios, usuario);
 		size_t aux = hash_cantidad(dato);
 		lista_insertar_ultimo(arreglo[aux], (void*)usuario);
-		hash_iter_avanzar(iter);
+		hash_iter_avanzar(iter_usuarios);
 	}
-	hash_iter_destruir(iter);
+	hash_iter_destruir(iter_usuarios);
 	size_t pos = 0;
 	size_t pos_inicial = 0;
 	for (i = 0; i < max+1; i++) {
 		if (lista_esta_vacia(arreglo[i])) continue;
-		lista_iter_t* iter = lista_iter_crear(arreglo[i]);
-		while(!lista_iter_al_final(iter)) {
-			res[pos] = (char*)lista_iter_ver_actual(iter);
+		lista_iter_t* iter_aux = lista_iter_crear(arreglo[i]);
+		while(!lista_iter_al_final(iter_aux)) {
+			res[pos] = (char*)lista_iter_ver_actual(iter_aux);
 			pos++;
-			lista_iter_avanzar(iter);
+			lista_iter_avanzar(iter_aux);
 		}
-		lista_iter_destruir(iter);
+		lista_iter_destruir(iter_aux);
 		if (lista_largo(arreglo[i]) > 1) {
 			size_t largo = pos - pos_inicial;
 			heap_sort((void**)(res + pos_inicial), largo, comparar);
 		}
 		pos_inicial = pos;
 	}
-	for (size_t i = 0; i < max+1; i++) {
+	for (i = 0; i < max+1; i++) {
 		lista_destruir(arreglo[i], NULL);
 	}
 	free(arreglo);
