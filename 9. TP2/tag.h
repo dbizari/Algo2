@@ -15,7 +15,7 @@ tag_t* tag_crear(const char* clave,const size_t freq);
 // Devuelve puntero a clave
 // Post: Devuelve puntero a clave
 // Pre: La estructura fue creada
-char* tag_ver_clave(const tag_t *tag);
+const char* tag_ver_clave(const tag_t *tag);
 
 // Devuelve la frecuencia del tag
 // Post: Devuelve la frecuencia del tag

@@ -6,7 +6,7 @@
 #include "hash.h"
 
 struct tag{
-	char * nombre;
+	const char * nombre;
 	size_t freq;
 };
 
@@ -15,18 +15,15 @@ struct tag{
  * *****************************************************************/
 
 tag_t* tag_crear(const char* clave, const size_t freq){
-    char * str_aux;
-	tag_t* aux = malloc(sizeof(tag_t));
+    tag_t* aux = malloc(sizeof(tag_t));
     if(!aux) return NULL;
 
-    str_aux = strdup(clave);
-    if(!str_aux) return NULL;
-	aux->nombre = str_aux;
+	aux->nombre = clave;
 	aux->freq = freq;
 	return aux;
 }
 
-char* tag_ver_clave(const tag_t *tag){
+const char* tag_ver_clave(const tag_t *tag){
     return tag == NULL ? NULL : tag->nombre;
 }
 
@@ -35,6 +32,5 @@ size_t tag_ver_freq(const tag_t *tag){
 }
 
 void tag_destruir(tag_t* tag){
-	free(tag->nombre);
     free(tag);
 }
