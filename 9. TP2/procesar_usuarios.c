@@ -131,6 +131,7 @@ void imprimir(hash_t* usuarios, char** arreglo) {
 		}
 		printf("%s", arreglo[i]);
 	}
+	printf("\n");
 }
 
 int main(int argc, char const *argv[]) {
