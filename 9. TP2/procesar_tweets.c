@@ -163,7 +163,6 @@ int procesar_tweets(size_t n,size_t k){
 			return EXIT_FAILURE;
 		}
 
-		printf("--- %lu\n",++cont );
 		for(size_t i = 0; i < n; i++){
 			if(procesar_linea(csm,hash_claves) != EXIT_SUCCESS){
 				hash_destruir(hash_claves);
@@ -171,6 +170,11 @@ int procesar_tweets(size_t n,size_t k){
 				return EXIT_FAILURE;
 			}
 		}
+        if(hash_cantidad(hash_claves) == 0){ //LLegó al fin del archivo
+            hash_destruir(hash_claves);
+            break;
+        }
+        printf("--- %lu\n",++cont );
 		if(imprimir_tt(k,hash_claves,csm) != EXIT_SUCCESS){
 			hash_destruir(hash_claves);
 			count_min_sketch_destruir(csm);
