@@ -15,6 +15,7 @@
 #define N_POS  	  1
 #define K_POS     2
 #define DELIM    ','
+#define SIZE_INIT 1000000
 
 /* *****************************************************************
  *                    FUNCIONES AUXILIARES
@@ -66,35 +67,34 @@ int validate_arguments(int argc, char const *argv[],size_t * n,size_t * k){
 }
 
 int procesar_linea(count_min_sketch_t * csm, hash_t * hash_claves){
-	char * linea = NULL,* str_aux = NULL;
+	char * linea = NULL,** array_str = NULL;
 	size_t tam = 0;
 	ssize_t largo = 0;
-	int tag_len = 0;
 
-	if((largo = getline(&linea, &tam, stdin)) == -1)
-		return EXIT_SUCCESS; // Llego al fin del archivo
+	if((largo = getline(&linea, &tam, stdin)) == -1){
+        free(linea);
+        return EXIT_SUCCESS; // Llego al fin del archivo
+    }
 
-	for (size_t j = 0; linea[j] != '\0'; j++,tag_len++) {
-		if(j == 0)
-			str_aux = NULL;
+    if (linea[largo-1] == '\n')
+        linea[--largo] = '\0';
 
-		if(linea[j+1] == DELIM || linea[j+1] == '\n'){
-			if(str_aux != NULL){
-				str_aux = substr(str_aux,(size_t)tag_len);
-				count_min_sketch_guardar(csm,str_aux);
-				if(!hash_pertenece(hash_claves,str_aux)){
-					if(!hash_guardar(hash_claves,str_aux,NULL)){
-						free(linea);
-						free(str_aux);
-						return EXIT_FAILURE;
-					}
-				}
-				free(str_aux); //Libero memoria que reservo substr
-			}
-			str_aux = &linea[j+2];
-			tag_len = -1;
-		}
-	}
+    array_str = split(linea,DELIM);
+    if(!array_str){
+        free(linea);
+        return EXIT_FAILURE;
+    }
+    for (size_t i = 1; array_str[i] != NULL; i++) {
+        count_min_sketch_guardar(csm,array_str[i]);
+        if(!hash_pertenece(hash_claves,array_str[i])){
+            if(!hash_guardar(hash_claves,array_str[i],NULL)){
+                free(linea);
+                free_strv(array_str);
+                return EXIT_FAILURE;
+            }
+        }
+    }
+    free_strv(array_str);
 	free(linea);
 	return EXIT_SUCCESS;
 }
@@ -153,7 +153,7 @@ int imprimir_tt(size_t k,hash_t * hash_claves,count_min_sketch_t * csm){
 
 int procesar_tweets(size_t n,size_t k){
 	size_t cont = 0;
-	count_min_sketch_t * csm = count_min_sketch_crear(n * 100);
+	count_min_sketch_t * csm = count_min_sketch_crear(SIZE_INIT);
 	if(!csm) return EXIT_FAILURE;
 
 	while(!feof(stdin)){
@@ -170,7 +170,7 @@ int procesar_tweets(size_t n,size_t k){
 				return EXIT_FAILURE;
 			}
 		}
-        if(hash_cantidad(hash_claves) == 0){ //LLegó al fin del archivo
+        if(hash_cantidad(hash_claves) == 0){ //LLegó al fin del archivo, ya que no le
             hash_destruir(hash_claves);
             break;
         }
