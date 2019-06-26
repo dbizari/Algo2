@@ -24,6 +24,8 @@ class Grafo:
         if v1 == v2: return
         if v1 not in self.vertices:
             self.agregar_vertice(v1)
+        if v2 not in self.vertices:
+            self.agregar_vertice(v2)
         self.vertices[v1].add(v2)
 
     def borrar_arista(self, v1, v2):
