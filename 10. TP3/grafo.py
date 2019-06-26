@@ -42,3 +42,6 @@ class Grafo:
     def estan_unidos(self, v1, v2):
         if v2 in self.vertices[v1]: return True
         return False
+
+    def __iter__(self):
+        return iter(self.vertices)
