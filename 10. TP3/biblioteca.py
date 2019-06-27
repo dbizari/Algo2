@@ -41,15 +41,15 @@ def centralidad(grafo):
     return cent
 
 
-def dfs_cfc(grafo, v, visitados, orden, p, s, cfcs, en_cfs):
-	visitados.agregar(v)
+def dfs_cfc(grafo, v, visitados, orden, p, s, cfcs, en_cfcs):
+	visitados.add(v)
 	s.apilar(v)
 	p.apilar(v)
 	for w in grafo.adyacentes(v):
 		if w not in visitados:
 			orden[w] = orden[v] + 1
 			dfs_cfc(grafo, w, visitados, orden, p, s, cfcs, en_cfcs)
-		elif w not in en_cfs:
+		elif w not in en_cfcs:
 			while orden[p.ver_tope()] > orden[w]:
 				p.desapilar()
 
@@ -59,7 +59,7 @@ def dfs_cfc(grafo, v, visitados, orden, p, s, cfcs, en_cfs):
 		nueva_cfc = []
 		while z != v:
 			z = s.desapilar()
-			en_cfs.agregar(z)
+			en_cfs.add(z)
 			nueva_cfc.append(z)
 		cfcs.append(nueva_cfc)
 		p.desapilar()

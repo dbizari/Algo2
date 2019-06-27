@@ -10,3 +10,6 @@ class Pila:
 
     def esta_vacia(self):
         return len(self.arreglo) == 0
+
+    def ver_tope(self):
+        return self.arreglo[0]
