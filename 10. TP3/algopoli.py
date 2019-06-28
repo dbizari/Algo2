@@ -1,8 +1,8 @@
-import grafo
+from grafo import Grafo
 import csv
 
 def cargar_archivo(ruta):
-    g = grafo.Grafo()
+    g = Grafo()
     with open(ruta) as archivo:
         arch = csv.reader(archivo, delimiter='\t')
         for linea in arch:

@@ -2,7 +2,6 @@ class Cola:
     def __init__(self):
         self.prim = None
         self.ult = None
-        self.cant = 0
 
     def encolar(self, dato):
         nodo = _Nodo(dato)
@@ -11,19 +10,19 @@ class Cola:
         else:
             self.ult.prox = nodo
         self.ult = nodo
-        self.cant += 1
 
     def desencolar(self):
         nodo = self.prim
+        if nodo == self.ult:
+            self.ult = None
         if nodo:
             self.prim = nodo.prox
-            self.cant -= 1
             return nodo.dato
         else:
             return None
 
     def esta_vacia(self):
-        return self.cant == 0
+        return self.prim == None
 
 
 class _Nodo:

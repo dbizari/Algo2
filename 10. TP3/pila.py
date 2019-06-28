@@ -6,10 +6,14 @@ class Pila:
         self.arreglo.append(dato)
 
     def desapilar(self):
+        if self.esta_vacia():
+            return None
         return self.arreglo.pop()
 
     def esta_vacia(self):
         return len(self.arreglo) == 0
 
     def ver_tope(self):
-        return self.arreglo[0]
+        if self.esta_vacia():
+            return None
+        return self.arreglo[-1]

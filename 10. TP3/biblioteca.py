@@ -1,6 +1,6 @@
-import grafo
-import cola
-import pila
+from grafo import Grafo
+from cola import Cola
+from pila import Pila
 
 def camino_minimo_bfs(grafo, origen):
     visitados = {}
@@ -8,7 +8,7 @@ def camino_minimo_bfs(grafo, origen):
     padre = {}
     padre[origen] = None
     distancia[origen] = 0
-    q = cola.Cola()
+    q = Cola()
     q.encolar(origen)
     while not q.esta_vacia():
         v = q.desencolar()
@@ -59,7 +59,7 @@ def dfs_cfc(grafo, v, visitados, orden, p, s, cfcs, en_cfcs):
 		nueva_cfc = []
 		while z != v:
 			z = s.desapilar()
-			en_cfs.add(z)
+			en_cfcs.add(z)
 			nueva_cfc.append(z)
 		cfcs.append(nueva_cfc)
 		p.desapilar()
@@ -67,8 +67,8 @@ def dfs_cfc(grafo, v, visitados, orden, p, s, cfcs, en_cfcs):
 def cfc(grafo):
 	visitados = set()
 	orden = {}
-	p = pila.Pila()
-	s = pila.Pila()
+	p = Pila()
+	s = Pila()
 	cfcs = []
 	en_cfs = set()
 	for v in grafo:
