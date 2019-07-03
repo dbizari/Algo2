@@ -33,10 +33,7 @@ class Grafo:
         self.vertices[v1].discard(v2) #Cambie remove por discard por si no se encuentra presente
 
     def obtener_vertices(self):
-        vertices = []
-        for v in self.vertices:
-            vertices.append(v)
-        return vertices
+        return list(self.vertices.keys())
 
     def obtener_vertice_random(self):
         return random.choice(list(self.vertices.keys()))
