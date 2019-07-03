@@ -33,15 +33,3 @@ class _Nodo:
     def __init__(self, dato):
         self.dato  = dato
         self.prox = None
-
-q = Cola()
-print(q.desencolar())
-q.encolar(5)
-q.encolar(6)
-q.encolar(7)
-q.encolar(8)
-print(q.desencolar())
-print(q.desencolar())
-print(q.desencolar())
-print(q.desencolar())
-print(q.desencolar())
