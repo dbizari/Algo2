@@ -5,11 +5,9 @@ class Grafo:
         self.vertices = {}
         self.cant_vertices = 0;
 
-    def adyacentes(self, v):
-        adyacentes = []
-        for ady in self.vertices[v]:
-            adyacentes.append(ady)
-        return adyacentes
+    def adyacentes(self,v):
+        if v not in self.vertices: return None
+        return list(self.vertices[v])
 
     def agregar_vertice(self, v):
         if v not in self.vertices:
@@ -40,10 +38,6 @@ class Grafo:
             vertices.append(v)
         return vertices
 
-    def adyacentes(self,v):
-        if v not in self.vertices: return None
-        return list(self.vertices[v])
-
     def obtener_vertice_random(self):
         return random.choice(list(self.vertices.keys()))
 
@@ -53,19 +47,3 @@ class Grafo:
 
     def __iter__(self):
         return iter(self.vertices)
-
-graph = Grafo()
-graph.agregar_vertice(9)
-graph.agregar_vertice(4)
-graph.agregar_vertice(5)
-graph.agregar_vertice(6)
-graph.agregar_vertice(7)
-graph.borrar_vertice(5)
-graph.borrar_vertice(6)
-graph.agregar_arista(7,6)
-graph.agregar_arista(5,6)
-graph.agregar_arista(9,4)
-graph.agregar_arista(9,5)
-graph.agregar_arista(9,7)
-
-print(graph.obtener_vertice_random())
