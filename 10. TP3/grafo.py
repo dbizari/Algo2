@@ -42,5 +42,12 @@ class Grafo:
         if v2 in self.vertices[v1]: return True
         return False
 
+    def existe(self, v):
+        return (v in self.vertices)
+
     def __iter__(self):
         return iter(self.vertices)
+
+grafo = Grafo()
+grafo.agregar_arista(4,3)
+print(grafo.existe(6))
