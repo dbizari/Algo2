@@ -6,8 +6,10 @@ import csv
 import biblioteca
 import sys
 
-COMANDOS = ["min_seguimientos", "mas_imp", "persecucion", "comunidades", "divulgar", "divulgar_ciclo", "cfc"]
-MAX_ARGS = 2
+def validar_argumentos():
+    if len(sys.argv) != 2:
+        return None
+    return sys.argv[1]
 
 def cargar_archivo(ruta):
     g = Grafo()
@@ -18,8 +20,9 @@ def cargar_archivo(ruta):
             g.agregar_arista(v1, v2)
     return g
 
-def min_seguimientos(grafo, p1, p2):
-    distancia, padre = biblioteca.camino_minimo_bfs(grafo, p1)
+def min_seguimientos(grafo, args):
+    print("min_seg",args)
+    """distancia, padre = biblioteca.camino_minimo_bfs(grafo, p1)
     if p2 not in distancia:
         print("Seguimiento imposible\n")
     else:
@@ -33,20 +36,43 @@ def min_seguimientos(grafo, p1, p2):
             if p.ver_tope()!=p2:
                 print(f"{p.desapilar()} -> ", end = '')
             else:
-                print(f"{p.desapilar()}")
+                print(f"{p.desapilar()}")"""
 
-def validar_argumentos():
-    if len(sys.argv) != 2:
-        return None
-    return sys.argv[1]
+def mas_imp(grafo, args):
+    print("mas_imp",args)
+
+def persecucion(grafo, args):
+    print("persecucion",args)
+
+def comunidades(grafo, args):
+    print("comunidades",args)
+
+def divulgar(grafo, args):
+    print("divulgar",args)
+
+def divulgar_ciclo(grafo, args):
+    print("divulgar_ciclo",args)
+
+def cfc(grafo, args):
+    print("cfc",args)
 
 def main():
     ruta = validar_argumentos()
     if ruta == None: return None
     grafo = cargar_archivo(ruta)
-    comando = input()
-    comando = comando.split(' ')
-    if comando[0] == COMANDOS[0]:
-        min_seguimientos(grafo, comando[1], comando[2])"""
 
+    for line in sys.stdin:
+        line = line.split()
+        COMANDOS[line[0]](grafo,line[1:])
+
+COMANDOS = {
+    "min_seguimientos": min_seguimientos,
+    "mas_imp": mas_imp,
+    "persecucion": persecucion,
+    "comunidades": comunidades,
+    "divulgar": divulgar,
+    "divulgar_ciclo": divulgar_ciclo,
+    "cfc": cfc
+}
+MAX_ARGS = 2
 main()
