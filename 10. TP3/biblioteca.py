@@ -3,21 +3,24 @@ from cola import Cola
 from pila import Pila
 import operator
 
-def camino_minimo_bfs(grafo, origen):
-    visitados = {}
+def camino_minimo_bfs(grafo, origen,destino):
+    visitados = set()
     distancia = {}
     padre = {}
     padre[origen] = None
     distancia[origen] = 0
     q = Cola()
     q.encolar(origen)
+    visitados.add(origen)
     while not q.esta_vacia():
         v = q.desencolar()
-        visitados[v] = True
         for w in grafo.adyacentes(v):
             if not w in visitados:
                 padre[w] = v
                 distancia[w] = distancia[v] + 1
+                visitados.add(w)
+                if w == destino:
+                    return distancia, padre
                 q.encolar(w)
     return distancia, padre
 

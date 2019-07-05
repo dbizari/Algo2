@@ -21,22 +21,23 @@ def cargar_archivo(ruta):
     return g
 
 def min_seguimientos(grafo, args):
-    print("min_seg",args)
-    """distancia, padre = biblioteca.camino_minimo_bfs(grafo, p1)
-    if p2 not in distancia:
+    origen  = args[0]
+    destino = args[1]
+    distancia, padre = biblioteca.camino_minimo_bfs(grafo, origen,destino)
+    if destino not in distancia:
         print("Seguimiento imposible\n")
     else:
         p = Pila()
-        aux = p2
-        while aux!=p1:
+        aux = destino
+        while aux != origen:
             p.apilar(aux)
             aux = padre[aux]
-        p.apilar(p1)
+        p.apilar(origen)
         while not p.esta_vacia():
-            if p.ver_tope()!=p2:
+            if p.ver_tope()!=destino:
                 print(f"{p.desapilar()} -> ", end = '')
             else:
-                print(f"{p.desapilar()}")"""
+                print(f"{p.desapilar()}")
 
 def mas_imp(grafo, args):
     print("mas_imp",args)
