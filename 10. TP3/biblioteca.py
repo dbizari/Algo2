@@ -1,7 +1,6 @@
 from grafo import Grafo
 from cola import Cola
 from pila import Pila
-import operator
 
 def camino_minimo_bfs(grafo, origen,destino):
     visitados = set()
