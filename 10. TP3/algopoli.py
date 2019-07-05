@@ -4,8 +4,10 @@ from pila import Pila
 from grafo import Grafo
 import csv
 import biblioteca
+import sys
 
 COMANDOS = ["min_seguimientos", "mas_imp", "persecucion", "comunidades", "divulgar", "divulgar_ciclo", "cfc"]
+MAX_ARGS = 2
 
 def cargar_archivo(ruta):
     g = Grafo()
@@ -33,11 +35,18 @@ def min_seguimientos(grafo, p1, p2):
             else:
                 print(f"{p.desapilar()}")
 
-def main(ruta):
+def validar_argumentos():
+    if len(sys.argv) != 2:
+        return None
+    return sys.argv[1]
+
+def main():
+    ruta = validar_argumentos()
+    if ruta == None: return None
     grafo = cargar_archivo(ruta)
     comando = input()
     comando = comando.split(' ')
     if comando[0] == COMANDOS[0]:
-        min_seguimientos(grafo, comando[1], comando[2])
+        min_seguimientos(grafo, comando[1], comando[2])"""
 
-main("mensajes.tsv")
+main()

@@ -47,7 +47,3 @@ class Grafo:
 
     def __iter__(self):
         return iter(self.vertices)
-
-grafo = Grafo()
-grafo.agregar_arista(4,3)
-print(grafo.existe(6))
