@@ -6,6 +6,7 @@ from grafo import Grafo
 import csv
 import biblioteca
 import sys
+import operator
 
 def validar_argumentos():
     if len(sys.argv) != 2:
@@ -41,7 +42,14 @@ def min_seguimientos(grafo, args):
                 print(f"{p.desapilar()}")
 
 def mas_imp(grafo, args):
-    print("mas_imp",args)
+    cant = int(args[0])
+    centralidad = biblioteca.centralidad(grafo)
+    cent_ordenado = sorted(centralidad.items(), key=operator.itemgetter(1))
+    cent_ordenado.reverse()
+    for i in range(cant):
+        print(f"{cent_ordenado[i][0]}", end = '')
+        if (i<cant-1): print(", ", end = '')
+    print("\n")
 
 def persecucion(grafo, args):
     print("persecucion",args)
@@ -75,7 +83,15 @@ def divulgar_ciclo(grafo, args):
     print("divulgar_ciclo",args)
 
 def cfc(grafo, args):
-    print("cfc",args)
+    cfcs = biblioteca.cfc(grafo)
+    for cfc in range(len(cfcs)):
+        print(f"CFC {cfc + 1}: ", end = '')
+        aux = cfcs[cfc]
+        largo = len(aux)
+        for v in range(largo):
+            print(f"{aux[v]}", end = '')
+            if v < largo - 1: print(", ", end = '')
+        print("\n")
 
 def main():
     ruta = validar_argumentos()
