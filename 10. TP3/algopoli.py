@@ -1,6 +1,7 @@
 #!/usr/bin/python3
 
 from pila import Pila
+from cola import Cola
 from grafo import Grafo
 import csv
 import biblioteca
@@ -49,7 +50,26 @@ def comunidades(grafo, args):
     print("comunidades",args)
 
 def divulgar(grafo, args):
-    print("divulgar",args)
+    origen = args[0]
+    n = int(args[1])
+    resultado=[]
+    visitados = set()
+    orden = {}
+    orden[origen] = 0
+    q = Cola()
+    q.encolar(origen)
+    visitados.add(origen)
+    while not q.esta_vacia():
+        v = q.desencolar()
+        for w in grafo.adyacentes(v):
+            if not w in visitados:
+                orden[w] = orden[v] + 1
+                if orden[w] > n:
+                    print(*resultado, sep=", ")
+                    return
+                resultado.append(w)
+                visitados.add(w)
+                q.encolar(w)
 
 def divulgar_ciclo(grafo, args):
     print("divulgar_ciclo",args)
