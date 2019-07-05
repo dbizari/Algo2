@@ -63,7 +63,15 @@ def divulgar_ciclo(grafo, args):
     print("divulgar_ciclo",args)
 
 def cfc(grafo, args):
-    print("cfc",args)
+    cfcs = biblioteca.cfc(grafo)
+    for cfc in range(len(cfcs)):
+        print(f"CFC {cfc + 1}: ", end = '')
+        aux = cfcs[cfc]
+        largo = len(aux)
+        for v in range(largo):
+            print(f"{aux[v]}", end = '')
+            if v < largo - 1: print(", ", end = '')
+        print("\n")
 
 def main():
     ruta = validar_argumentos()
