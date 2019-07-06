@@ -118,11 +118,12 @@ def divulgar_ciclo(grafo, args): #Capaz convenga pasarlo a BFS para no matar al 
     n = int(args[1])
     buscado = origen
     visitados = set()
-    orden = {}
+    pila = Pila()
+    #orden = {}
     padre = {}
-    orden[origen] = 0
+    #orden[origen] = 0
     padre[origen] = None
-    ciclo = biblioteca.dfs_ciclo(grafo, origen, buscado, visitados, padre, orden, n)
+    ciclo = biblioteca.dfs_ciclo(grafo, origen, buscado, visitados, padre, pila, n)
     if ciclo == None:
         print("No se encontro recorrido")
     else:
