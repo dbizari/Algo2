@@ -58,16 +58,17 @@ def mas_imp(grafo, args):
     print(*mas_imp_cant, sep = ", ")
 
 def persecucion(grafo, args):
-    cant = int(args[len(args) - 1])
+    cant = int(args[1])
+    delincuentes = args[0].split(",")
     mas_imp = _mas_imp(grafo, cant)
     importancia = {}
     for i in range(len(mas_imp)):
         importancia[mas_imp[i]] = i
 
     caminos = []
-    for i in range(len(args) - 1):
+    for delin in delincuentes:      #range(len(args) - 1):
         for j in range(cant):
-            camino = _min_seguimientos(grafo, args[i], mas_imp[j])
+            camino = _min_seguimientos(grafo, delin, mas_imp[j])
             if camino:
                 caminos.append(camino)
     caminos.sort(key = len) #ordeno de menos elementos a mas

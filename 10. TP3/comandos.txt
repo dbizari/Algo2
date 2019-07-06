@@ -1,10 +1,2 @@
-divulgar_ciclo 74 5
-divulgar_ciclo 19 11
-divulgar_ciclo 74 5
-divulgar_ciclo 19 11
-divulgar_ciclo 74 5
-divulgar_ciclo 19 11
-divulgar_ciclo 74 5
-divulgar_ciclo 19 11
-divulgar_ciclo 74 5
-divulgar_ciclo 19 11
+persecucion 10,14,17 5
+persecucion 19,11,7,12 3
