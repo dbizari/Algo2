@@ -2,6 +2,25 @@ from grafo import Grafo
 from cola import Cola
 from pila import Pila
 
+def camino_minimo(grafo, origen):
+        visitados = set()
+        distancia = {}
+        padre = {}
+        padre[origen] = None
+        distancia[origen] = 0
+        q = Cola()
+        q.encolar(origen)
+        visitados.add(origen)
+        while not q.esta_vacia():
+            v = q.desencolar()
+            for w in grafo.adyacentes(v):
+                if not w in visitados:
+                    padre[w] = v
+                    distancia[w] = distancia[v] + 1
+                    visitados.add(w)
+                    q.encolar(w)
+        return distancia, padre
+
 def camino_minimo_bfs(grafo, origen,destino):
     visitados = set()
     distancia = {}
@@ -23,23 +42,44 @@ def camino_minimo_bfs(grafo, origen,destino):
                 q.encolar(w)
     return distancia, padre
 
+def ordenar_vertices(grafo, distancias, rango):
+    cant_valores = rango
+    contador = [0]*(cant_valores+1)
+    for v in distancias:
+        pos = cant_valores - distancias[v]
+        contador[pos]+=1
+    suma = [0]*(cant_valores + 1)
+    for i in range(1, cant_valores + 1):
+        suma[i] = suma[i-1] + contador[i-1]
+    ordenado = [0]*(len(distancias))
+    for v in distancias:
+        pos = suma[cant_valores - distancias[v]]
+        ordenado[pos] = v
+        suma[cant_valores - distancias[v]]+=1
+    return ordenado
+
+
 def centralidad(grafo):
     cent = {}
     for v in grafo: cent[v] = 0
     for v in grafo:
+        # hacia todos los demas vertices
+        distancia, padre = camino_minimo(grafo, v)
+        cent_aux = {}
+        for w in grafo: cent_aux[w] = 0
+        # Aca filtramos (de ser necesario) los vertices a distancia infinita,
+        # y ordenamos de mayor a menor
+        vertices_ordenados = ordenar_vertices(grafo, distancia, len(grafo.obtener_vertices()) + 1)
+        for w in vertices_ordenados:
+            if padre[w]:
+                cent_aux[padre[w]] += 1 + cent_aux[w]
+        # le sumamos 1 a la centralidad de todos los vertices que se encuentren en
+        # el medio del camino
         for w in grafo:
-            if v == w: continue
-            # con el algoritmo que corresponda al grafo
-            distancia, padre = camino_minimo_bfs(grafo, v, w)
-            # salteamos si no hay camino de v a w
-            if w not in distancia: continue
-            actual = padre[w]
-            # le sumamos 1 a la centralidad de todos los vertices que se encuentren en
-            # el medio del camino
-            while actual != v:
-                cent[actual] += 1
-                actual = padre[actual]
+            if w == v: continue
+            cent[w] += cent_aux[w]
     return cent
+
 
 
 

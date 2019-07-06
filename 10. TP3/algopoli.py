@@ -39,17 +39,16 @@ def _min_seguimientos(grafo, origen, destino):
 def min_seguimientos(grafo, args):
     camino = _min_seguimientos(grafo, args[0], args[1])
     if not camino:
-        print("Seguimiento imposible\n")
+        print("Seguimiento imposible")
     else:
         print(*camino, sep = " -> ")
 
 def _mas_imp(grafo, cant):
     centralidad = biblioteca.centralidad(grafo)
-    cent_ordenado = sorted(centralidad.items(), key=operator.itemgetter(1))
-    cent_ordenado.reverse()
+    cent_ordenado = biblioteca.ordenar_vertices(grafo, centralidad, max(centralidad.values()) + 1)
     mas_imp_cant = []
     for i in range(cant):
-        mas_imp_cant.append(cent_ordenado[i][0])
+        mas_imp_cant.append(cent_ordenado[i])
     return mas_imp_cant
 
 def mas_imp(grafo, args):
