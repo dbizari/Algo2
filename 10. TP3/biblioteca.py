@@ -101,7 +101,7 @@ def label_prop(grafo):
             entradas[w].add(v)
         labels[v] = count
         count += 1
-    for i in range(1000):
+    for i in range(500):
         for v in labels:
             labels[v] = _max_freq(entradas, labels, v)
 
