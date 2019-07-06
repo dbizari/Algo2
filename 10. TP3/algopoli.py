@@ -86,8 +86,20 @@ def divulgar(grafo, args):
                 visitados.add(w)
                 q.encolar(w)
 
-def divulgar_ciclo(grafo, args):
-    print("divulgar_ciclo",args)
+def divulgar_ciclo(grafo, args): #Capaz convenga pasarlo a BFS para no matar al stack
+    origen = args[0]
+    n = int(args[1])
+    buscado = origen
+    visitados = set()
+    orden = {}
+    padre = {}
+    orden[origen] = 0
+    padre[origen] = None
+    ciclo = biblioteca.dfs_ciclo(grafo, origen, buscado, visitados, padre, orden, n)
+    if ciclo == None:
+        print("No se encontro recorrido")
+    else:
+        print(*ciclo, sep=" -> ")
 
 def cfc(grafo, args):
     cfcs = biblioteca.cfc(grafo)

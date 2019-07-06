@@ -111,3 +111,33 @@ def label_prop(grafo):
     return resultado
     #for v in resultado:
         #print(v,resultado[v])
+
+def dfs_ciclo(grafo, v, buscado, visitados, padre, orden, n):
+    visitados.add(v)
+    for w in grafo.adyacentes(v):
+        if w in visitados:
+            if w != padre[v] and w == buscado and orden[v] >= n:
+                print(orden[v],orden[w])
+                return reconstruir_ciclo(padre, w, v)
+        else:
+            padre[w] = v
+            orden[w] = orden[v] + 1
+            #if orden[w] > n:
+            #    return None
+            ciclo = dfs_ciclo(grafo, w, buscado, visitados, padre, orden, n)
+            if ciclo is not None:
+                return ciclo
+    return None
+
+def reconstruir_ciclo(padre, inicio, fin):
+    v = fin
+    pila = Pila()
+    camino = []
+    while v != inicio:
+        pila.apilar(v)
+        v = padre[v]
+    camino.append(inicio)
+    while not pila.esta_vacia():
+        camino.append(pila.desapilar())
+    camino.append(inicio)
+    return camino

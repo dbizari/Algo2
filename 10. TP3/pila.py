@@ -11,7 +11,7 @@ class Pila:
         return self.arreglo.pop()
 
     def esta_vacia(self):
-        return len(self.arreglo) == 0
+        return (len(self.arreglo) == 0)
 
     def ver_tope(self):
         if self.esta_vacia():
