@@ -56,10 +56,10 @@ def persecucion(grafo, args):
 
 def comunidades(grafo, args):
     n = int(args[0])
-    biblioteca.label_prop(grafo)
-    """for comu in comunidades:
+    comunidades = biblioteca.label_prop(grafo)
+    for comu in comunidades:
         if len(comunidades[comu]) < n: continue
-        print(*comunidades[comu], sep=", ")"""
+        print(*comunidades[comu], sep=", ")
 
 def divulgar(grafo, args):
     origen = args[0]

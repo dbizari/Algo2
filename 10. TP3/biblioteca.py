@@ -108,6 +108,6 @@ def label_prop(grafo):
     resultado = {}
     for key, value in sorted(labels.items()):
         resultado.setdefault(value, []).append(key)
-    #return resultado
-    for v in resultado:
-        print(v,resultado[v])
+    return resultado
+    #for v in resultado:
+        #print(v,resultado[v])

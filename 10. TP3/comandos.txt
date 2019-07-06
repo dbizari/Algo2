@@ -1,7 +1,1 @@
-min_seguimientos 10 4
-min_seguimientos 30 12
-min_seguimientos 55 39
-min_seguimientos 4 67
-divulgar 30 4
-divulgar 30 1
 comunidades 10
