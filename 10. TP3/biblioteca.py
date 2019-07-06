@@ -43,19 +43,19 @@ def camino_minimo_bfs(grafo, origen,destino):
     return distancia, padre
 
 def ordenar_vertices(grafo, distancias, rango):
-    cant_valores = rango
-    contador = [0]*(cant_valores+1)
+    contador = [0]*(rango)
     for v in distancias:
-        pos = cant_valores - distancias[v]
+        pos = distancias[v] - 1
         contador[pos]+=1
-    suma = [0]*(cant_valores + 1)
-    for i in range(1, cant_valores + 1):
+    suma = [0]*(rango)
+    for i in range(1, rango):
         suma[i] = suma[i-1] + contador[i-1]
     ordenado = [0]*(len(distancias))
     for v in distancias:
-        pos = suma[cant_valores - distancias[v]]
+        pos = suma[distancias[v] - 1]
         ordenado[pos] = v
-        suma[cant_valores - distancias[v]]+=1
+        suma[distancias[v] - 1]+=1
+    ordenado.reverse()
     return ordenado
 
 
@@ -69,10 +69,10 @@ def centralidad(grafo):
         for w in grafo: cent_aux[w] = 0
         # Aca filtramos (de ser necesario) los vertices a distancia infinita,
         # y ordenamos de mayor a menor
-        vertices_ordenados = ordenar_vertices(grafo, distancia, len(grafo.obtener_vertices()) + 1)
+        vertices_ordenados = ordenar_vertices(grafo, distancia, len(grafo.obtener_vertices()))
         for w in vertices_ordenados:
-            if padre[w]:
-                cent_aux[padre[w]] += 1 + cent_aux[w]
+            if w == v: continue
+            cent_aux[padre[w]] += 1 + cent_aux[w]
         # le sumamos 1 a la centralidad de todos los vertices que se encuentren en
         # el medio del camino
         for w in grafo:

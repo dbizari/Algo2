@@ -45,7 +45,7 @@ def min_seguimientos(grafo, args):
 
 def _mas_imp(grafo, cant):
     centralidad = biblioteca.centralidad(grafo)
-    cent_ordenado = biblioteca.ordenar_vertices(grafo, centralidad, max(centralidad.values()) + 1)
+    cent_ordenado = biblioteca.ordenar_vertices(grafo, centralidad, max(centralidad.values()))
     mas_imp_cant = []
     for i in range(cant):
         mas_imp_cant.append(cent_ordenado[i])
@@ -133,12 +133,7 @@ def cfc(grafo, args):
     cfcs = biblioteca.cfc(grafo)
     for cfc in range(len(cfcs)):
         print(f"CFC {cfc + 1}: ", end = '')
-        aux = cfcs[cfc]
-        largo = len(aux)
-        for v in range(largo):
-            print(f"{aux[v]}", end = '')
-            if v < largo - 1: print(", ", end = '')
-        print("\n")
+        print(*cfcs[cfc], sep = ", ")
 
 def main():
     ruta = validar_argumentos()
