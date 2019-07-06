@@ -22,37 +22,64 @@ def cargar_archivo(ruta):
             g.agregar_arista(v1, v2)
     return g
 
-def min_seguimientos(grafo, args):
-    origen  = args[0]
-    destino = args[1]
+def _min_seguimientos(grafo, origen, destino):
     distancia, padre = biblioteca.camino_minimo_bfs(grafo, origen,destino)
-    if destino not in distancia:
+    if destino not in distancia: return None
+    p = Pila()
+    aux = destino
+    while aux != origen:
+        p.apilar(aux)
+        aux = padre[aux]
+    p.apilar(origen)
+    camino = []
+    while not p.esta_vacia():
+        camino.append(p.desapilar())
+    return camino
+
+def min_seguimientos(grafo, args):
+    camino = _min_seguimientos(grafo, args[0], args[1])
+    if not camino:
         print("Seguimiento imposible\n")
     else:
-        p = Pila()
-        aux = destino
-        while aux != origen:
-            p.apilar(aux)
-            aux = padre[aux]
-        p.apilar(origen)
-        while not p.esta_vacia():
-            if p.ver_tope()!=destino:
-                print(f"{p.desapilar()} -> ", end = '')
-            else:
-                print(f"{p.desapilar()}")
+        print(*camino, sep = " -> ")
 
-def mas_imp(grafo, args):
-    cant = int(args[0])
+def _mas_imp(grafo, cant):
     centralidad = biblioteca.centralidad(grafo)
     cent_ordenado = sorted(centralidad.items(), key=operator.itemgetter(1))
     cent_ordenado.reverse()
+    mas_imp_cant = []
     for i in range(cant):
-        print(f"{cent_ordenado[i][0]}", end = '')
-        if (i<cant-1): print(", ", end = '')
-    print("\n")
+        mas_imp_cant.append(cent_ordenado[i][0])
+    return mas_imp_cant
+
+def mas_imp(grafo, args):
+    cant = int(args[0])
+    mas_imp_cant = _mas_imp(grafo, cant)
+    print(*mas_imp_cant, sep = ", ")
 
 def persecucion(grafo, args):
-    print("persecucion",args)
+    cant = int(args[len(args) - 1])
+    mas_imp = _mas_imp(grafo, cant)
+    importancia = {}
+    for i in range(len(mas_imp)):
+        importancia[mas_imp[i]] = i
+
+    caminos = []
+    for i in range(len(args) - 1):
+        for j in range(cant):
+            camino = _min_seguimientos(grafo, args[i], mas_imp[j])
+            if camino:
+                caminos.append(camino)
+    caminos.sort(key = len) #ordeno de menos elementos a mas
+    min = len(caminos[0])
+    camino = caminos[0]
+    for i in range(1, len(caminos)):
+        if len(caminos[i]) > min: break
+        d1 = camino[min-1]
+        d2 = caminos[i][min-1]
+        if importancia[d1] > importancia[d2]:
+            camino = caminos[i]
+    print(*camino, sep = " -> ")
 
 def comunidades(grafo, args):
     n = int(args[0])
