@@ -43,15 +43,19 @@ def min_seguimientos(grafo, args):
     else:
         print(*camino, sep = " -> ")
 
-def mas_imp(grafo, args):
-    cant = int(args[0])
+def _mas_imp(grafo, cant):
     centralidad = biblioteca.centralidad(grafo)
     cent_ordenado = sorted(centralidad.items(), key=operator.itemgetter(1))
     cent_ordenado.reverse()
+    mas_imp_cant = []
     for i in range(cant):
-        print(f"{cent_ordenado[i][0]}", end = '')
-        if (i<cant-1): print(", ", end = '')
-    print("\n")
+        mas_imp_cant.append(cent_ordenado[i][0])
+    return mas_imp_cant
+
+def mas_imp(grafo, args):
+    cant = int(args[0])
+    mas_imp_cant = _mas_imp(grafo, cant)
+    print(*mas_imp_cant, sep = ", ")
 
 def persecucion(grafo, args):
     print("persecucion",args)
