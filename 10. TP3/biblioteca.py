@@ -78,26 +78,36 @@ def cfc(grafo):
 			dfs_cfc(grafo, v, visitados, orden, p, s, cfcs, en_cfs)
 	return cfcs
 
-    def _max_freq(entradas, labels, v):
-        if len(entradas[v]) == 0: return labels[v]
-        aux = {}
-        max = None
-        for w in entradas:
-            label = labels[w]
-            if not max: max = label
-            aux[label] = aux.get(label, 0) + 1 #si no existe el valor w en el dic devuelve 0 mas 1
-            if aux[label] > aux[max] : max = label #sino devuelve lo que hay mas 1
-        return max
+def _max_freq(entradas, labels, v):
+    if entradas.get(v,0) == 0: return labels[v]
+    if len(entradas[v]) == 0: return labels[v]
+    aux = {}
+    max = None
+    for w in entradas[v]:
+        label = labels[w]
+        if not max: max = label
+        aux[label] = aux.get(label, 0) + 1 #si no existe el valor w en el dic devuelve 0 mas 1
+        if aux[label] > aux[max] : max = label #sino devuelve lo que hay mas 1
+    return max
 
-    def label_prop(grafo):
-        entradas = {}
-        labels = {}
-        for v in grafo:
-            for w in grafo.adyacentes(v):
-                if w not in entradas:
-                    entradas[w] = set()
-                entradas[w].add(v)
-            labels[v] = #nose que asignarles
-        for i in range(500):
-            for v in grafo: #hay que ver si se puede recorrer asi o tiene que tener un orden
-                labels[v] = _max_freq(entradas, visitados, v)
+def label_prop(grafo):
+    entradas = {}
+    labels = {}
+    count = 0
+    for v in grafo:
+        for w in grafo.adyacentes(v):
+            if w not in entradas:
+                entradas[w] = set()
+            entradas[w].add(v)
+        labels[v] = count
+        count += 1
+    for i in range(1000):
+        for v in labels:
+            labels[v] = _max_freq(entradas, labels, v)
+
+    resultado = {}
+    for key, value in sorted(labels.items()):
+        resultado.setdefault(value, []).append(key)
+    #return resultado
+    for v in resultado:
+        print(v,resultado[v])
