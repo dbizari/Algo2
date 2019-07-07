@@ -117,8 +117,10 @@ def divulgar_ciclo(grafo, args): #Capaz convenga pasarlo a BFS para no matar al 
     origen = args[0]
     n = int(args[1])
     sol_parcial = []
+    visitados = set()
     sol_parcial.append(origen)
-    ciclo = biblioteca.dfs_ciclo(grafo, origen, origen, sol_parcial, n)
+    visitados.add(origen)
+    ciclo = biblioteca.dfs_ciclo(grafo, origen, origen, visitados, sol_parcial, n)
     if ciclo == None:
         print("No se encontro recorrido")
     else:

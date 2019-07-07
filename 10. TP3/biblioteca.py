@@ -152,17 +152,21 @@ def label_prop(grafo):
     #for v in resultado:
         #print(v,resultado[v])
 
-def dfs_ciclo(grafo, v, buscado, sol_parcial, n):
+def dfs_ciclo(grafo, v, buscado, visitados, sol_parcial, n):
     for w in grafo.adyacentes(v):
+        #En realidad si necesitamos un set de visitados, para que en un mismo recorrido no se repitan datos!!! Entonces debe ser dinámico, cuando se va volviendo de la recursividad, se deben poder recorrer nuevamente
         if len(sol_parcial) > n:
             return None
-        if w == buscado and len(sol_parcial) == n:
-            return reconstruir_ciclo(sol_parcial, buscado)
-        sol_parcial.append(w)
-        ciclo = dfs_ciclo(grafo, w, buscado, sol_parcial, n)
-        sol_parcial.pop()
-        if ciclo is not None:
-            return ciclo
+        if w in visitados:
+            if w == buscado and len(sol_parcial) == n:
+                return reconstruir_ciclo(sol_parcial, buscado)
+        else:
+            visitados.add(w)
+            sol_parcial.append(w)
+            ciclo = dfs_ciclo(grafo, w, buscado, visitados, sol_parcial, n)
+            visitados.remove(sol_parcial.pop())
+            if ciclo is not None:
+                return ciclo
     return None
 
 def reconstruir_ciclo(sol_parcial, inicio):

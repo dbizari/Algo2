@@ -1,2 +1,5 @@
-divulgar_ciclo 74 5
-divulgar_ciclo 19 11
+divulgar_ciclo 99 5
+divulgar_ciclo 890 8
+divulgar_ciclo 2345 14
+divulgar_ciclo 19 17
+divulgar_ciclo 10 1
