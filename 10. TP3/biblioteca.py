@@ -46,8 +46,8 @@ def camino_minimo_bfs(grafo, origen,destino):
 def random_walks(grafo):
     apariciones = {}
     cant_vertices = len(grafo.obtener_vertices())
-    largo = 100
-    recorridos =  1500
+    largo = cant_vertices//4
+    recorridos =  cant_vertices*2
     for v in grafo: apariciones[v] = 0
     for i in range(recorridos):
         vertice = grafo.obtener_vertice_random()
