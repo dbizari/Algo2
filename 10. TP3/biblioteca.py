@@ -152,26 +152,21 @@ def label_prop(grafo):
     #for v in resultado:
         #print(v,resultado[v])
 
-def dfs_ciclo(grafo, v, buscado, visitados, padre, pila, n):
-    visitados.add(v)
-    pila.apilar(v)
+def dfs_ciclo(grafo, v, buscado, sol_parcial, n):
     for w in grafo.adyacentes(v):
-        if w in visitados:
-            if w != padre[v] and w == buscado and len(pila.arreglo) == n:
-                return reconstruir_ciclo(pila, buscado)
-        else:
-            padre[w] = v
-            if len(pila.arreglo) > n:
-                break
-            ciclo = dfs_ciclo(grafo, w, buscado, visitados, padre, pila, n)
-            if ciclo is not None:
-                return ciclo
-    pila.desapilar()
+        if len(sol_parcial) > n:
+            return None
+        if w == buscado and len(sol_parcial) == n:
+            return reconstruir_ciclo(sol_parcial, buscado)
+        sol_parcial.append(w)
+        ciclo = dfs_ciclo(grafo, w, buscado, sol_parcial, n)
+        sol_parcial.pop()
+        if ciclo is not None:
+            return ciclo
     return None
 
-def reconstruir_ciclo(pila, inicio):
+def reconstruir_ciclo(sol_parcial, inicio):
     camino = []
+    camino = sol_parcial.copy()
     camino.append(inicio)
-    while not pila.esta_vacia():
-        camino.append(pila.desapilar())
     return camino
