@@ -20,7 +20,7 @@ class Grafo:
         self.cant_vertices-=1
 
     def agregar_arista(self, v1, v2):
-        if v1 == v2: return
+        #if v1 == v2: return
         if v1 not in self.vertices:
             self.agregar_vertice(v1)
         if v2 not in self.vertices:
