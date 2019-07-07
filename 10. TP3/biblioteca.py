@@ -1,6 +1,7 @@
 from grafo import Grafo
 from cola import Cola
 from pila import Pila
+import random
 
 def camino_minimo(grafo, origen):
         visitados = set()
@@ -42,46 +43,22 @@ def camino_minimo_bfs(grafo, origen,destino):
                 q.encolar(w)
     return distancia, padre
 
-def ordenar_vertices(grafo, distancias, rango):
-    contador = [0]*(rango)
-    for v in distancias:
-        pos = distancias[v] - 1
-        contador[pos]+=1
-    suma = [0]*(rango)
-    for i in range(1, rango):
-        suma[i] = suma[i-1] + contador[i-1]
-    ordenado = [0]*(len(distancias))
-    for v in distancias:
-        pos = suma[distancias[v] - 1]
-        ordenado[pos] = v
-        suma[distancias[v] - 1]+=1
-    ordenado.reverse()
-    return ordenado
+def random_walks(grafo):
+    apariciones = {}
+    cant_vertices = len(grafo.obtener_vertices())
+    largo = 100
+    recorridos =  1500
+    for v in grafo: apariciones[v] = 0
+    for i in range(recorridos):
+        vertice = grafo.obtener_vertice_random()
+        apariciones[vertice] += 1
+        for j in range(largo):
+            adyacentes = grafo.adyacentes(vertice)
+            if len(adyacentes) != 0:
+                v2 = random.choice(adyacentes)
+                apariciones[v2] += 1
 
-
-def centralidad(grafo):
-    cent = {}
-    for v in grafo: cent[v] = 0
-    for v in grafo:
-        # hacia todos los demas vertices
-        distancia, padre = camino_minimo(grafo, v)
-        cent_aux = {}
-        for w in grafo: cent_aux[w] = 0
-        # Aca filtramos (de ser necesario) los vertices a distancia infinita,
-        # y ordenamos de mayor a menor
-        vertices_ordenados = ordenar_vertices(grafo, distancia, len(grafo.obtener_vertices()))
-        for w in vertices_ordenados:
-            if w == v: continue
-            cent_aux[padre[w]] += 1 + cent_aux[w]
-        # le sumamos 1 a la centralidad de todos los vertices que se encuentren en
-        # el medio del camino
-        for w in grafo:
-            if w == v: continue
-            cent[w] += cent_aux[w]
-    return cent
-
-
-
+    return apariciones
 
 def dfs_cfc(grafo, v, visitados, orden, p, s, cfcs, en_cfs):
 	visitados.add(v)

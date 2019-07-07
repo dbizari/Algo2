@@ -43,9 +43,25 @@ def min_seguimientos(grafo, args):
     else:
         print(*camino, sep = " -> ")
 
+def _ordenar_vertices(distancias, rango):
+    contador = [0]*(rango)
+    for v in distancias:
+        pos = distancias[v]
+        contador[pos]+=1
+    suma = [0]*(rango)
+    for i in range(1, rango):
+        suma[i] = suma[i-1] + contador[i-1]
+    ordenado = [0]*(len(distancias))
+    for v in distancias:
+        pos = suma[distancias[v]]
+        ordenado[pos] = v
+        suma[distancias[v]]+=1
+    ordenado.reverse()
+    return ordenado
+
 def _mas_imp(grafo, cant):
-    centralidad = biblioteca.centralidad(grafo)
-    cent_ordenado = biblioteca.ordenar_vertices(grafo, centralidad, max(centralidad.values()))
+    centralidad = biblioteca.random_walks(grafo)
+    cent_ordenado = _ordenar_vertices(centralidad, max(centralidad.values()) + 1)
     mas_imp_cant = []
     for i in range(cant):
         mas_imp_cant.append(cent_ordenado[i])
