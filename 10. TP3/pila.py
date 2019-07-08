@@ -7,7 +7,7 @@ class Pila:
 
     def desapilar(self):
         if self.esta_vacia():
-            return None
+            return []
         return self.arreglo.pop()
 
     def esta_vacia(self):
@@ -15,5 +15,5 @@ class Pila:
 
     def ver_tope(self):
         if self.esta_vacia():
-            return None
+            return []
         return self.arreglo[-1]

@@ -6,17 +6,20 @@ class Grafo:
         self.cant_vertices = 0;
 
     def adyacentes(self,v):
-        if v not in self.vertices: return None
-        return list(self.vertices[v])
+        if v not in self.vertices: return []
+        return self.vertices[v]
 
     def agregar_vertice(self, v):
         if v not in self.vertices:
-            self.vertices[v] = set()
+            self.vertices[v] = []
             self.cant_vertices += 1
 
     def borrar_vertice(self, v):
         if v not in self.vertices: return
         del self.vertices[v]
+        for w in grafo:
+            if v in self.vertices[w]:
+                self.vertices[w].pop(v)
         self.cant_vertices-=1
 
     def agregar_arista(self, v1, v2):
@@ -25,7 +28,7 @@ class Grafo:
             self.agregar_vertice(v1)
         if v2 not in self.vertices:
             self.agregar_vertice(v2)
-        self.vertices[v1].add(v2)
+        self.vertices[v1].append(v2)
 
     def borrar_arista(self, v1, v2):
         if v1 not in self.vertices or v2 not in self.vertices:
