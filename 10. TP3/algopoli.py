@@ -144,9 +144,11 @@ def divulgar_ciclo(grafo, args): #Capaz convenga pasarlo a BFS para no matar al 
 
 def cfc(grafo, args):
     cfcs = biblioteca.cfc(grafo)
+    cont = 1
     for cfc in range(len(cfcs)):
-        print(f"CFC {cfc + 1}: ", end = '')
+        print(f"CFC {cont}: ", end = '')
         print(*cfcs[cfc], sep = ", ")
+        cont+=1
 
 def main():
     ruta = validar_argumentos()
