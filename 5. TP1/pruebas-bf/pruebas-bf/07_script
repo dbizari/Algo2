@@ -1,0 +1,27 @@
+Pido dos numeros: ,>,
+A cada numero le resto el ascii de '0' (48)
+<------------------------------------------------
+>------------------------------------------------
+
+En la celda 4 voy a tener el resultado
+[ Mientras el segundo no sea 0
+	Resto 1 a la celda 2 -
+	Mudo lo que esta en la celda 1 a las 3 y 4:
+	<
+	[
+		->>+>+<<<
+	]
+	Ahora en celda 0 tengo 0
+	En celda 3 tengo el numero
+	En celda 4 mantengo el acumulado
+	Vuelvo a llevar lo de la celda 3 a la 0
+	>>
+	[
+		-<<+>>
+	]
+	<
+]
+>>
+Le sumo el ascii de 0 al resultado
+++++++++++++++++++++++++++++++++++++++++++++++++
+.

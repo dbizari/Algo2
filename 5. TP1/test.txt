@@ -1,0 +1,5 @@
+Esta linea tiene: 20
+Esta otra linea, en cambio, tiene... 40.
+Otra de 10
+Finalmente con 19 y
+una ultima con los 21
